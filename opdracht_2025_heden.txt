@@ -1,0 +1,16 @@
+[tag01]
+Gemeente Almelo
+
+[tag02]
+Functie|ICT-Architect
+
+[tag03]
+•	Architectuurfunctie volwassen gemaakt: proces voor schrijven PSA verbeterd. Solution Architectuur onderdeel gemaakt van het wijzigingsproces (als onderdeel van een team). 
+•	Referentie- en domeinarchitecturen opgesteld en; ArchiMate-modellen in BlueDolphin.
+•	Missie, visie en strategie voor Automatiseringsmanagement uitgewerkt (infra & technisch applicatiebeheer) en vertaald naar roadmaps en standaarden.
+•	Solution architectuur voor implementatie nieuwe portal voor inwoners.
+•	Verbeterde samenhang tussen infrastructuur, applicaties en dienstverlening; focus op betrouwbaarheid, beveiliging en beheersbaarheid.
+
+# Belangrijkste prestaties
+[tag04]
+•	Architectuurdenken verankerd in de organisatie door een reeks minicursussen en praktische templates; teams betrekken nu vroegtijdig architectuur en besluiten worden vastgelegd met ADR’s.
