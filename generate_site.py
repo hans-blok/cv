@@ -23,21 +23,29 @@ def parse_engagement(file_path):
     if current_key:
         data[current_key] = "\n".join(current_value).strip()
 
+    # Periode uit bestandsnaam halen
     filename = os.path.basename(file_path)
     periode = filename.replace("opdracht_", "").replace(".txt", "").replace("_", " – ")
-    data["PERIODE"] = periode
+    data = {"PERIODE": periode, **data}  # Zorg dat PERIODE altijd bovenaan staat
 
     return data
 
+def extract_year(filename):
+    parts = filename.replace(".txt", "").split("_")
+    for part in reversed(parts):
+        if part.isdigit():
+            return int(part)
+    return 0
+
 tables_html = ""
-for filename in sorted(os.listdir(engagements_dir)):
+for filename in sorted(os.listdir(engagements_dir), key=extract_year, reverse=True):
     if filename.endswith(".txt"):
         filepath = os.path.join(engagements_dir, filename)
-        cv_data = parse_engagement(filepath)
+        engagement_data = parse_engagement(filepath)
 
         table_rows = "".join(
             f"<tr><td class='label'>{key}</td><td><div class='tekstblok'>{value}</div></td></tr>"
-            for key, value in cv_data.items()
+            for key, value in engagement_data.items()
         )
 
         tables_html += f"<table>{table_rows}</table><br><br>"
@@ -89,13 +97,9 @@ html_content = f"""
             white-space: pre-wrap;
             font-family: inherit;
             margin: 0;
-            text-indent: -1em;
-            padding-left: 1em;
-        }}
-        .tekstblok::before {{
-            content: "";
-            display: block;
-            height: 0.5em;
+            text-indent: -0.5em;
+            padding-left: 0.5em;
+            line-height: 1.4;
         }}
     </style>
 </head>
