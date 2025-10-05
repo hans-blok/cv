@@ -102,10 +102,16 @@ html_content = f"""
             margin-top: 120px;
             margin-bottom: 40px;
         }}
+
+        /* Tabellen en uitlijning */
         table {{
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 30px;
+        }}
+        tr {{
+            /* forceer dat iedere cel in een rij bovenaan begint */
+            vertical-align: top;
         }}
         td {{
             vertical-align: top;
@@ -115,20 +121,46 @@ html_content = f"""
         td.label {{
             width: 25%;
             font-weight: bold;
+            vertical-align: top; /* expliciet voor labels */
+            white-space: nowrap;
+            padding-right: 16px;
         }}
+
+        /* Tekstblok en lijsten - geen negatieve indent, geen top-margin op eerste element */
         .tekstblok {{
+            display: block;
             white-space: pre-wrap;
             font-family: inherit;
             margin: 0;
-            text-indent: -0.5em;
             padding-left: 0.5em;
             line-height: 1.4;
+        }}
+        .tekstblok p {{
+            margin: 0 0 0.6em 0; /* geen margin-top zodat content echt bovenaan begint */
+        }}
+        .tekstblok p:first-child {{ margin-top: 0; }}
+        .tekstblok ul {{
+            margin: 0.2em 0 0.6em 1.15em;
+            padding: 0;
+            list-style-position: outside;
+        }}
+        .tekstblok li {{
+            margin: 0.25em 0;
+        }}
+
+        /* mobiele aanpassing */
+        @media (max-width:700px){{
+            body{{margin:18px;font-size:11pt}}
+            td.label{{display:block;width:100%;font-size:10pt;padding-bottom:6px}}
+            td{{display:block;padding:8px 0;border-bottom:1px solid #ccc}}
+            .logo{{position:relative;top:0;left:0;width:60px;margin-bottom:8px}}
+            h1{{margin-top:12px}}
         }}
     </style>
 </head>
 <body>
     <img src="{logo_path}" alt="Logo" class="logo" />
-    <h1>Opdrachten</h1>
+    <h1>Werkervaring</h1>
     {tables_html}
 </body>
 </html>

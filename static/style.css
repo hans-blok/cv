@@ -47,15 +47,16 @@ table{
   border-collapse:collapse;
   margin-bottom:28px;
   background:transparent;
-  box-shadow:0 0 0 1px transparent;
 }
-tr{
-  vertical-align:top;
+tr{ /* zorg dat rijen consistent zijn */
+  vertical-align: top;
 }
 td{
   padding:12px 10px;
   border-bottom:1px solid var(--border);
-  vertical-align:top;
+  vertical-align: top; /* forceer top-alignment */
+  padding-top:12px;
+  padding-bottom:12px;
 }
 td.label{
   width:28%;
@@ -63,20 +64,39 @@ td.label{
   color:var(--muted);
   padding-right:18px;
   white-space:nowrap;
+  vertical-align: top; /* expliciet voor labels */
+  /* maak label cellen altijd als table-cell zichtbaar zodat hoogte gelijk loopt */
+  display:table-cell;
 }
 
 /* Tekstblok en lijstjes */
 .tekstblok{
+  display:block;
   white-space:pre-wrap;
   margin:0;
-  padding:0;
+  padding:0 0 0 0.5em; /* consistente inspringing voor alle content */
   font-family:inherit;
-  text-indent:-0.5em;
-  padding-left:0.5em;
+  line-height:1.4;
 }
-.tekstblok p{margin:0 0 0.6em 0}
-.tekstblok ul{margin:0.2em 0 0.6em 1.2em;padding-left:0}
-.tekstblok li{margin:0.25em 0}
+.tekstblok p{
+  margin:0 0 0.6em 0;
+}
+.tekstblok ul{
+  margin:0.2em 0 0.6em 0;
+  padding-left:1.15em; /* bullets netjes uitlijnen met de tekst */
+  list-style-position: outside;
+}
+.tekstblok li{
+  margin:0.25em 0;
+}
+
+/* kleine verbetering voor inline bullets die uit data komen (zonder <ul>) */
+.tekstblok > ul,
+.tekstblok > p,
+.tekstblok > li {
+  /* behoud consistente top-alignment binnen cel */
+  display:block;
+}
 
 /* Responsive */
 @media (max-width:700px){
