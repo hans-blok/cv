@@ -14,3 +14,6 @@ Functie|ICT-Architect
 # Belangrijkste prestaties
 [tag04]
 •	Architectuurdenken verankerd in de organisatie door een reeks minicursussen en praktische templates; teams betrekken nu vroegtijdig architectuur en besluiten worden vastgelegd met ADR’s.
+
+[tag05]
+GEMMA, Common Ground, BlueDolphin, Digitalisering overheid, Federatieve Service Connectiviteit (FSC), API-Gateway
