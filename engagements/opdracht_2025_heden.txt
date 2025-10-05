@@ -2,7 +2,7 @@ ORGANISATIE
 Gemeente Almelo
 
 FUNCTIE
-Functie|ICT-Architect
+ICT-Architect
 
 WERKZAAMHEDEN
 •	Architectuurfunctie volwassen gemaakt: proces voor schrijven PSA verbeterd. Solution Architectuur onderdeel gemaakt van het wijzigingsproces (als onderdeel van een team). 
