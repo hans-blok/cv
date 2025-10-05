@@ -37,6 +37,29 @@ def extract_year(filename):
             return int(part)
     return 0
 
+def format_value_for_html(value):
+    lines = value.splitlines()
+    html_parts = []
+    in_list = False
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("•"):
+            if not in_list:
+                html_parts.append("<ul>")
+                in_list = True
+            item = stripped.lstrip("•").strip()
+            html_parts.append(f"<li>{item}</li>")
+        else:
+            if in_list:
+                html_parts.append("</ul>")
+                in_list = False
+            if stripped:
+                # behoud nieuwe regels als <p>
+                html_parts.append(f"<p>{stripped}</p>")
+    if in_list:
+        html_parts.append("</ul>")
+    return "".join(html_parts)
+
 tables_html = ""
 for filename in sorted(os.listdir(engagements_dir), key=extract_year, reverse=True):
     if filename.endswith(".txt"):
@@ -44,7 +67,7 @@ for filename in sorted(os.listdir(engagements_dir), key=extract_year, reverse=Tr
         engagement_data = parse_engagement(filepath)
 
         table_rows = "".join(
-            f"<tr><td class='label'>{key}</td><td><div class='tekstblok'>{value}</div></td></tr>"
+            f"<tr><td class='label'>{key}</td><td><div class='tekstblok'>{format_value_for_html(value)}</div></td></tr>"
             for key, value in engagement_data.items()
         )
 
@@ -105,7 +128,7 @@ html_content = f"""
 </head>
 <body>
     <img src="{logo_path}" alt="Logo" class="logo" />
-    <h1>Werkervaring</h1>
+    <h1>Opdrachten</h1>
     {tables_html}
 </body>
 </html>
