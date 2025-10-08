@@ -1,0 +1,39 @@
+# Functioneel ontwerp html-generator
+
+
+# ( example ) means entity
+#` means data item
+# / means initatie function
+
+
+DO FOR ALL (blokken) (blocks.txt)
+    WRITE `block_title (formaat vet en in hoofdletters)
+    SEARCH FILE met file-naam gelijk aan `blockname
+    IF `blockname = personal THEN
+       /write_personal
+       WRITE grijze_blok_lijn
+    IF `blockname = education THEN
+       /write_education
+       WRITE grijze_blok_lijn
+    IF `blockname = courses
+       /write_courses
+       WRITE grijze_blok_lijn
+    IF `blockname = courses_short THEN
+       /write_courses_short
+       WRITE grijze_blok_lijn
+    IF `blockname = engagements THEN
+       /write_engagements
+       WRITE grijze_blok_lijn
+END DO FOR ALL
+   
+
+
+FUNCTION:write_personal
+ DO FOR ALL personal_items
+    WRITE een regel met `personal_item_tag en `personal_item_value
+END DO FOR ALL
+
+FUNCTION:write_education
+ DO FOR ALL educations
+    WRITE een regel met period `personal_item_tag en `personal_item_value
+END DO FOR ALL

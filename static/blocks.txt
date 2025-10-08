@@ -1,0 +1,6 @@
+personal|
+education|OPLEIDINGEN
+certifications|BELANGRIJKSTE CERTIFICERINGEN
+courses|CURSUSSEN
+courses-short|OVERIGE CURSUSSEN
+engagements|WERKERVARING

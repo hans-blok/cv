@@ -1,108 +1,71 @@
-/* Algemeen */
+/* Minimalistisch: tabellen zonder interne lijnen; blokscheiders lichtgrijs en dikker */
 :root{
-  --bg: #ffffff;
-  --text: #111;
-  --muted: #666;
-  --accent: #0b63b8;
-  --border: #e0e0e0;
-  --max-width: 1000px;
+  --bg:#ffffff;
+  --text:#111;
+  --muted:#666;
   --font-family: "Univers", Arial, sans-serif;
+  --font-size:11pt;
+  --max-width:1000px;
+  --block-sep:#efefef;
+  --block-sep-width:3px;
+  --section-sep:#e6e6e6;
 }
 
-*{box-sizing:border-box}
+/* base */
 html,body{height:100%}
 body{
-  margin:40px;
-  background:var(--bg);
-  color:var(--text);
+  margin:28px;
   font-family:var(--font-family);
+  font-size:var(--font-size);
+  color:var(--text);
+  background:var(--bg);
   line-height:1.45;
-  font-size:10.5pt;
+  text-align:left;
 }
 
-/* Header / logo */
-.logo{
-  position: absolute;
-  top:20px;
-  left:20px;
-  width:75px;
-  height:auto;
-  object-fit:contain;
-}
-h1{
-  font-weight:700;
-  margin-top:120px;
-  margin-bottom:28px;
-  font-size:20pt;
-  color:var(--accent);
-}
+/* logo */
+.site-logo{position:absolute;top:18px;left:18px;width:150px;height:auto;object-fit:contain}
 
-/* Table layout voor opdrachten */
-.container{
-  max-width:var(--max-width);
-  margin:0 auto;
-}
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-bottom:28px;
-  background:transparent;
-}
-tr{ /* zorg dat rijen consistent zijn */
-  vertical-align: top;
-}
-td{
-  padding:12px 10px;
-  border-bottom:1px solid var(--border);
-  vertical-align: top; /* forceer top-alignment */
-  padding-top:12px;
-  padding-bottom:12px;
-}
-td.label{
-  width:28%;
-  font-weight:700;
-  color:var(--muted);
-  padding-right:18px;
-  white-space:nowrap;
-  vertical-align: top; /* expliciet voor labels */
-  /* maak label cellen altijd als table-cell zichtbaar zodat hoogte gelijk loopt */
-  display:table-cell;
-}
+/* container */
+.container{max-width:var(--max-width);margin:0 auto}
 
-/* Tekstblok en lijstjes */
-.tekstblok{
-  display:block;
-  white-space:pre-wrap;
-  margin:0;
-  padding:0 0 0 0.5em; /* consistente inspringing voor alle content */
-  font-family:inherit;
-  line-height:1.4;
-}
-.tekstblok p{
-  margin:0 0 0.6em 0;
-}
-.tekstblok ul{
-  margin:0.2em 0 0.6em 0;
-  padding-left:1.15em; /* bullets netjes uitlijnen met de tekst */
-  list-style-position: outside;
-}
-.tekstblok li{
-  margin:0.25em 0;
-}
+/* headings */
+h1,h2{font-weight:700;margin:10px 0;color:#000;font-size:inherit;line-height:1.2;padding-bottom:6px;margin-bottom:12px;border-bottom:1px solid var(--section-sep)}
 
-/* kleine verbetering voor inline bullets die uit data komen (zonder <ul>) */
-.tekstblok > ul,
-.tekstblok > p,
-.tekstblok > li {
-  /* behoud consistente top-alignment binnen cel */
-  display:block;
-}
+/* block: title bold uppercase, then content; block has thicker light separator */
+.block{margin-bottom:16px;padding-bottom:10px;border-bottom:var(--block-sep-width) solid var(--block-sep)}
+.block-title{font-weight:700;text-transform:uppercase;margin:0 0 8px 0}
 
-/* Responsive */
+/* tables minimal: no internal borders; spacing only */
+table{width:100%;border-collapse:collapse;margin-bottom:12px;background:transparent}
+tr{vertical-align:top}
+td{padding:6px 8px;vertical-align:top;border:none;text-align:left}
+
+/* label column */
+td.label{width:20%;font-weight:700;color:var(--muted);padding-right:8px;white-space:nowrap;text-align:left}
+
+/* value / content column */
+td.value{padding-left:6px}
+
+/* education specifics */
+.education-table td.edu-name{font-weight:700;padding-left:6px;text-align:left}
+.education-table td.edu-place{color:var(--muted);padding-left:8px;text-align:left}
+.education-table td.edu-desc{padding-left:6px}
+
+/* engagement tables: separate each engagement by a very light line */
+.engagement-table{margin-bottom:18px;border-bottom:1px solid var(--section-sep);padding-bottom:8px}
+
+/* text blocks */
+.tekstblok{white-space:pre-wrap;margin:0;padding:0;font-family:inherit;line-height:1.45}
+.tekstblok p{margin:0 0 0.6em 0}
+.tekstblok ul{margin:0.2em 0 0.6em 1.15em;padding-left:0}
+.tekstblok li{margin:0.25em 0}
+
+/* responsive */
 @media (max-width:700px){
-  body{margin:18px;font-size:11pt}
-  td.label{display:block;width:100%;font-size:10pt;padding-bottom:6px}
-  td{display:block;padding:8px 0;border-bottom:1px solid var(--border)}
-  .logo{position:relative;top:0;left:0;width:60px;margin-bottom:8px}
-  h1{margin-top:12px}
+  body{margin:14px;font-size:11pt}
+  td.label{display:block;width:100%;font-size:10pt;padding-bottom:6px;text-align:left}
+  td{display:block;padding:8px 0}
+  .site-logo{position:relative;top:0;left:0;width:120px;margin-bottom:8px}
+  .personal{flex-direction:column}
 }

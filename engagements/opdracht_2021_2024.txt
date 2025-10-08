@@ -1,16 +1,12 @@
-ORGANISATIE
-Belastingdienst (Inkomensheffing)
-
-FUNCTIE
-Solution architect
-
-WERKZAAMHEDEN
+Organisatie|Belastingdienst (Inkomensheffing)
+Functie|Solution architect
+Werkzaamheden|
 •	Medeverantwoordelijk voor het definiëren van standaarden, ondersteunen van drie agile-teams bij het realiseren van features en bewaken van de kaders. 
 •	Samen met de software architecten definieer ik de visie op de technologie. Samen met lead architect en het MT zorg ik ervoor dat in de porfolio-laag ruimte komt om enablers te realiseren waarmee de visie wordt vormgegeven. Het traject bestaat uit een complexe migratie van een monoliet naar een gedistribueerd systeem. Daarnaast is een migratie uitgevoerd van een traditioneel hosting platform naar Redhat OpenShift. In de rol was ik verantwoordelijk voor het definiëren van een architectuur waar foutafhandeling en monitoring (Grafana, Open Telemetry) is ingericht.
 •	Voorzitter van een stuurgroep met als verantwoordelijkheid om de transitie vorm te geven naar een werkwijze voor het maken van ontwerpproducten  die past binnen het SAFe framework.
 
-BELANGRIJKSTE PRESTATIES
+Belangrijkste prestaties|
 •	Door agile-teams actief te ondersteunen en aandachtig te luisteren naar hun uitdagingen, heb ik bijgedragen aan een cultuur waarin externe ontwikkelaars zich verbonden voelen met de doelstellingen van de Belastingdienst. Dit stimuleert hen om met betrokkenheid en toewijding te werken aan deze doelen en versterkt de innovatiekracht binnen de organisatie, waardoor het ontwikkelen van software steeds aantrekkelijker wordt.
 
-TREFWOORDEN
-Service Oriente Architecture, SAFE, migratie monolithisch systeem naar microservices, micro frontend, IAM
+Trefwoorden|
+Service Oriented Architecture, SAFE, migratie monolithisch systeem naar microservices, micro frontend, IAM
