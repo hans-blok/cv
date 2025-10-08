@@ -1,67 +1,54 @@
 import os
 import re
 import html
+from pathlib import Path
 
-engagements_dir = "engagements"
-personal_dir = "personal"
-education_file = os.path.join("education", "educations.txt")
-courses_file = os.path.join("courses", "courses.txt")
-courses_short_file = os.path.join("courses", "courses-short.txt")
-blocks_dir = "blocks"
-blocks_config = os.path.join("static", "blocks.txt")
-logo_dirs = ["pictures", "logos", "logo", "images", "static/images"]
-css_path = "static/style.css"
-output_file = "cv.html"
+# --- configuration (adjust paths if needed) ---
+ROOT = Path(__file__).resolve().parent
+ENGAGEMENTS_DIR = ROOT / "engagements"
+PERSONAL_DIR = ROOT / "personal"
+EDUCATION_FILE = ROOT / "education" / "educations.txt"
+COURSES_FILE = ROOT / "courses" / "courses.txt"
+COURSES_SHORT_FILE = ROOT / "courses" / "courses-short.txt"
+BLOCKS_DIR = ROOT / "blocks"
+BLOCKS_CONFIG_CANDIDATES = [ROOT / "specs" / "blocks.txt", ROOT / "static" / "blocks.txt"]
+CSS_PATH = ROOT / "static" / "style.css"
+OUTPUT_FILE = ROOT / "cv.html"
+LOGO_DIRS = ["pictures", "logos", "logo", "images", "static/images"]
 
-def norm_path_for_html(p):
+# --- utilities ---
+def norm_path_for_html(p: str) -> str:
     return p.replace("\\", "/")
 
-def find_site_logo():
-    for name in ("pictures/logo.png","pictures/logo.jpg","pictures/logo-header.png"):
-        if os.path.isfile(name): return norm_path_for_html(name)
-    for d in logo_dirs:
-        if os.path.isdir(d):
-            for n in sorted(os.listdir(d)):
-                if n.lower().startswith("logo") and n.lower().endswith((".png",".jpg",".jpeg",".webp",".gif")):
-                    return norm_path_for_html(os.path.join(d,n))
+def find_file_in_dirs(names):
+    for n in names:
+        p = ROOT / n
+        if p.is_file():
+            return norm_path_for_html(str(p))
+    for d in LOGO_DIRS:
+        dd = ROOT / d
+        if dd.is_dir():
+            for f in sorted(dd.iterdir()):
+                if f.is_file() and f.name.lower().startswith("logo") and f.suffix.lower() in (".png", ".jpg", ".jpeg", ".webp", ".gif"):
+                    return norm_path_for_html(str(f))
     return ""
+
+def find_site_logo():
+    return find_file_in_dirs(["pictures/logo.png", "pictures/logo.jpg", "pictures/logo-header.png"])
 
 def find_profile_image():
-    for name in ("pictures/profile.png","pictures/profile.jpg","pictures/profile.jpeg"):
-        if os.path.isfile(name): return norm_path_for_html(name)
-    for d in logo_dirs:
-        if os.path.isdir(d):
-            for n in sorted(os.listdir(d)):
-                ln = n.lower()
-                if any(pfx in ln for pfx in ("profile","profielfoto","foto","portrait","headshot")) and ln.endswith((".png",".jpg",".jpeg",".webp",".gif")):
-                    return norm_path_for_html(os.path.join(d,n))
-    return ""
+    return find_file_in_dirs(["pictures/profile.jpg", "pictures/profile.png", "pictures/profile.jpeg"])
 
-def parse_personal(directory):
-    # read all files in personal/ or personal.txt lines like "Tag|Value"
-    data = {}
-    if os.path.isdir(directory):
-        files = sorted(os.listdir(directory))
-    else:
-        files = []
-    # also accept single file personal.txt at root of personal_dir
-    for fname in files:
-        path = os.path.join(directory, fname)
-        if not os.path.isfile(path): continue
-        with open(path, encoding="utf-8") as f:
-            for line in f:
-                line = line.strip()
-                if not line or "|" not in line: continue
-                k,v = [p.strip() for p in line.split("|",1)]
-                data[k] = v
-    return data
+# --- text helpers ---
+_URL_RE = re.compile(r"(https?://[^\s<>]+|www\.[^\s<>]+|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})")
 
-_url_re = re.compile(r"(https?://[^\s<>]+|www\.[^\s<>]+|[A-Za-z0-9._%+-]+@[A-ZaZ0-9.-]+\.[A-Za-z]{2,})")
-def linkify(text):
-    if not text: return ""
-    parts=[]; last=0
-    for m in _url_re.finditer(text):
-        s,e = m.span()
+def linkify(text: str) -> str:
+    if not text:
+        return ""
+    parts = []
+    last = 0
+    for m in _URL_RE.finditer(text):
+        s, e = m.span()
         parts.append(html.escape(text[last:s]))
         match = m.group(0)
         if "@" in match and not match.startswith("http"):
@@ -73,247 +60,306 @@ def linkify(text):
     parts.append(html.escape(text[last:]))
     return "".join(parts)
 
-def parse_engagement(file_path):
-    with open(file_path, encoding="utf-8") as f:
-        raw = f.read()
-    lines = [ln.rstrip() for ln in raw.splitlines()]
-    data = {}
-    cur = None; buf=[]
-    for line in lines:
-        s = line.strip()
-        if s and s == s.upper() and not s.startswith("•"):
-            if cur:
-                data[cur] = "\n".join(buf).strip()
-            cur = s
-            buf=[]
-        else:
-            buf.append(line)
-    if cur:
-        data[cur] = "\n".join(buf).strip()
-    filename = os.path.basename(file_path)
-    periode = filename.replace("opdracht_","").replace(".txt","").replace("_"," – ")
-    data = {"PERIODE": periode, **data}
-    return data
-
-def extract_year(filename):
-    nums = re.findall(r"\d{4}", filename)
-    if nums:
-        try: return int(nums[-1])
-        except: return 0
-    return 0
-
-def format_value_for_html(value):
-    if value is None: return ""
+def format_value_for_html(value: str) -> str:
+    if not value:
+        return ""
     lines = value.splitlines()
-    parts=[]; in_list=False; buf=[]
-    def flush():
-        nonlocal buf
-        if buf:
-            text = " ".join(p.strip() for p in buf).strip()
-            if text: parts.append(f"<p>{linkify(text)}</p>")
-            buf=[]
+    parts = []
+    in_list = False
+    para = []
+
+    def flush_para():
+        nonlocal para
+        if para:
+            txt = " ".join(p.strip() for p in para).strip()
+            if txt:
+                parts.append(f"<p>{linkify(txt)}</p>")
+            para = []
+
     for ln in lines:
         s = ln.strip()
         if s.startswith("•"):
-            flush()
+            flush_para()
             item = s.lstrip("•").strip()
             if not in_list:
-                in_list=True; parts.append("<ul>")
+                in_list = True
+                parts.append("<ul>")
             parts.append(f"<li>{linkify(item)}</li>")
         else:
             if in_list:
-                parts.append("</ul>"); in_list=False
-            if s=="":
-                flush()
+                parts.append("</ul>")
+                in_list = False
+            if s == "":
+                flush_para()
             else:
-                buf.append(ln)
-    flush()
-    if in_list: parts.append("</ul>")
+                para.append(ln)
+    flush_para()
+    if in_list:
+        parts.append("</ul>")
     return "".join(parts)
 
-def parse_educations(file_path):
-    items=[]
-    if not os.path.isfile(file_path): return items
-    with open(file_path, encoding="utf-8") as f:
+def pretty_label(key: str) -> str:
+    if not key:
+        return ""
+    mapping = {
+        "PERIODE": "Periode",
+        "ORGANISATIE": "Organisatie",
+        "FUNCTIE": "Functie",
+        "WERKZAAMHEDEN": "Werkzaamheden",
+        "BELANGRIJKSTE PRESTATIES": "Belangrijkste prestaties"
+    }
+    up = key.strip().upper()
+    return mapping.get(up, key.strip().capitalize())
+
+# --- parsers ---
+def parse_personal(directory: Path) -> dict:
+    data = {}
+    if directory.is_dir():
+        for fname in sorted(directory.iterdir()):
+            if not fname.is_file():
+                continue
+            with fname.open(encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or "|" not in line:
+                        continue
+                    k, v = [p.strip() for p in line.split("|", 1)]
+                    data[k] = v
+    else:
+        pfile = ROOT / "personal.txt"
+        if pfile.is_file():
+            with pfile.open(encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or "|" not in line:
+                        continue
+                    k, v = [p.strip() for p in line.split("|", 1)]
+                    data[k] = v
+    return data
+
+def parse_educations(file_path: Path):
+    items = []
+    if not file_path.is_file():
+        return items
+    with file_path.open(encoding="utf-8") as f:
         for raw in f:
             line = raw.strip()
-            if not line: continue
-            if line.upper().startswith("OPLEIDING"): continue
+            if not line or line.upper().startswith("OPLEIDING"):
+                continue
             parts = [p.strip() for p in line.split("|")]
-            period = parts[0] if len(parts)>0 else ""
-            name = parts[1] if len(parts)>1 else ""
-            institute = parts[2] if len(parts)>2 else ""
-            place = parts[3] if len(parts)>3 else ""
-            addition = parts[4] if len(parts)>4 else (parts[2] if len(parts)==3 else "")
-            items.append({"PERIODE":period,"NAAM":name,"INSTITUUT":institute,"PLAATS":place,"TOELICHTING":addition})
+            period = parts[0] if len(parts) > 0 else ""
+            name = parts[1] if len(parts) > 1 else ""
+            institute = parts[2] if len(parts) > 2 else ""
+            place = parts[3] if len(parts) > 3 else ""
+            addition = parts[4] if len(parts) > 4 else (parts[2] if len(parts) == 3 else "")
+            items.append({"PERIODE": period, "NAAM": name, "INSTITUUT": institute, "PLAATS": place, "TOELICHTING": addition})
     return items
 
-def parse_courses(file_path):
-    rows=[]
-    if not os.path.isfile(file_path): return rows
-    with open(file_path, encoding="utf-8") as f:
+def parse_courses(file_path: Path):
+    rows = []
+    if not file_path.is_file():
+        return rows
+    with file_path.open(encoding="utf-8") as f:
         for raw in f:
             line = raw.strip()
-            if not line: continue
-            if line.lower().startswith("courses"): continue
+            if not line or line.lower().startswith("courses"):
+                continue
             parts = [p.strip() for p in line.split("|")]
-            period = parts[0] if len(parts)>0 else ""
-            items = parts[1:] if len(parts)>1 else []
-            rows.append({"PERIODE":period,"ITEMS":items})
+            period = parts[0] if len(parts) > 0 else ""
+            items = parts[1:] if len(parts) > 1 else []
+            rows.append({"PERIODE": period, "ITEMS": items})
     return rows
 
-def parse_courses_short(file_path):
-    # if file contains "period|item1|item2" treat like courses, else collect simple lines
-    rows=[]
-    if not os.path.isfile(file_path): return rows
-    simple=[]
-    with open(file_path, encoding="utf-8") as f:
+def parse_courses_short(file_path: Path):
+    rows = []
+    if not file_path.is_file():
+        return rows
+    simple = []
+    with file_path.open(encoding="utf-8") as f:
         for raw in f:
             line = raw.strip()
-            if not line: continue
+            if not line:
+                continue
             if "|" in line:
-                parts=[p.strip() for p in line.split("|")]
-                period=parts[0]; items=parts[1:]
-                rows.append({"PERIODE":period,"ITEMS":items})
+                parts = [p.strip() for p in line.split("|")]
+                period = parts[0]
+                items = parts[1:]
+                rows.append({"PERIODE": period, "ITEMS": items})
             else:
                 simple.append(line)
     if simple:
-        rows.append({"PERIODE":"","ITEMS":simple})
+        rows.append({"PERIODE": "", "ITEMS": simple})
     return rows
 
-def parse_blocks(config_path, blocks_directory):
-    blocks=[]
-    if not os.path.isfile(config_path): return blocks
-    with open(config_path, encoding="utf-8") as f:
+def parse_engagement(file_path: Path):
+    with file_path.open(encoding="utf-8") as f:
+        raw = f.read()
+    lines = [ln.rstrip() for ln in raw.splitlines()]
+    data = {}
+    current = None
+    buffer = []
+    for ln in lines:
+        s = ln.strip()
+        if s and s == s.upper() and not s.startswith("•"):
+            if current:
+                data[current] = "\n".join(buffer).strip()
+            current = s
+            buffer = []
+        else:
+            buffer.append(ln)
+    if current:
+        data[current] = "\n".join(buffer).strip()
+    filename = file_path.name
+    period = filename.replace("opdracht_", "").replace(".txt", "").replace("_", " – ")
+    data = {"PERIODE": period, **data}
+    return data
+
+def extract_year(filename: str) -> int:
+    nums = re.findall(r"\d{4}", filename)
+    if nums:
+        try:
+            return int(nums[-1])
+        except Exception:
+            return 0
+    return 0
+
+def parse_blocks_config() -> list:
+    cfg = None
+    for candidate in BLOCKS_CONFIG_CANDIDATES:
+        if candidate.is_file():
+            cfg = candidate
+            break
+    if cfg is None:
+        return []
+    blocks = []
+    with cfg.open(encoding="utf-8") as f:
         for raw in f:
             line = raw.strip()
-            if not line or line.startswith("#"): continue
-            parts = [p.strip() for p in line.split("|",1)]
-            blockname = parts[0]
-            blocktitle = parts[1] if len(parts)>1 else blockname
-            blocks.append({"NAME":blockname, "TITLE":blocktitle})
+            if not line or line.startswith("#"):
+                continue
+            parts = [p.strip() for p in line.split("|", 1)]
+            filename = parts[0]
+            title = parts[1] if len(parts) > 1 else filename
+            blocks.append({"NAME": filename, "TITLE": title})
     return blocks
 
-def pretty_label(key):
-    mapping = {
-        "PERIODE":"Periode",
-        "ORGANISATIE":"Organisatie",
-        "FUNCTIE":"Functie",
-        "WERKZAAMHEDEN":"Werkzaamheden",
-        "BELANGRIJKSTE PRESTATIES":"Belangrijkste prestaties"
-    }
-    if not key: return ""
-    return mapping.get(key.strip().upper(), key.strip().capitalize())
+# --- render helpers ---
+def format_personal_value_for_html(value: str) -> str:
+    if not value:
+        return ""
+    lines = value.splitlines()
+    if len(lines) == 1:
+        return linkify(lines[0])
+    return "".join(f"<p>{linkify(l)}</p>" for l in lines)
 
-# build content
-site_logo = find_site_logo()
-profile_image = find_profile_image()
-personal = parse_personal(personal_dir)
-educations = parse_educations(education_file)
-courses = parse_courses(courses_file) + parse_courses_short(courses_short_file)
-blocks = parse_blocks(blocks_config, blocks_dir)
-
-def render_personal():
-    if not personal: return ""
-    rows=[]
-    for k,v in personal.items():
+def render_personal(personal: dict) -> str:
+    if not personal:
+        return ""
+    rows = []
+    for k, v in personal.items():
         rows.append(f"<tr><td class='label'>{html.escape(k)}</td><td class='value'><div class='tekstblok'>{format_personal_value_for_html(v)}</div></td></tr>")
     return "<table class='personal-table'>" + "".join(rows) + "</table>"
 
-def format_personal_value_for_html(value):
-    lines = value.splitlines()
-    if len(lines)==1:
-        return linkify(lines[0])
-    return "".join(f"<p>{linkify(line)}</p>" for line in lines)
-
-def render_education():
-    if not educations: return ""
-    rows=[]
-    # compute min-width in ch
+def render_educations(educations: list) -> str:
+    if not educations:
+        return ""
     max_chars = 0
     for ed in educations:
-        name_full = ed["NAAM"] + (f" — {ed['INSTITUUT']}" if ed["INSTITUUT"] else "")
+        name_full = ed.get("NAAM", "") + (f" — {ed.get('INSTITUUT', '')}" if ed.get("INSTITUUT") else "")
         max_chars = max(max_chars, len(name_full))
     min_ch = max_chars + 2
+    rows = []
     for ed in educations:
-        peri = html.escape(ed["PERIODE"])
-        naam = html.escape(ed["NAAM"] + (f" — {ed['INSTITUUT']}" if ed["INSTITUUT"] else ""))
-        plaats = html.escape(ed["PLAATS"])
-        toel = format_value_for_html(ed["TOELICHTING"])
+        peri = html.escape(ed.get("PERIODE", ""))
+        naam = html.escape(ed.get("NAAM", "") + (f" — {ed.get('INSTITUUT', '')}" if ed.get("INSTITUUT") else ""))
+        plaats = html.escape(ed.get("PLAATS", ""))
+        toel = format_value_for_html(ed.get("TOELICHTING", ""))
         rows.append(f"<tr><td class='label'>{peri}</td><td class='edu-name' style='min-width:{min_ch}ch'>{naam}</td><td class='edu-place'>{plaats}</td></tr>")
         if toel:
             rows.append(f"<tr><td class='label'>&nbsp;</td><td class='edu-desc' colspan='2'><div class='tekstblok'>{toel}</div></td></tr>")
     return "<table class='education-table'>" + "".join(rows) + "</table>"
 
-def render_courses():
-    if not courses: return ""
-    rows=[]
-    for c in courses:
-        peri = html.escape(c["PERIODE"])
-        items = ", ".join(html.escape(it) for it in c["ITEMS"])
+def render_courses(courses_list: list) -> str:
+    if not courses_list:
+        return ""
+    rows = []
+    for c in courses_list:
+        peri = html.escape(c.get("PERIODE", ""))
+        items = ", ".join(html.escape(i) for i in c.get("ITEMS", []))
         rows.append(f"<tr><td class='label'>{peri}</td><td class='edu-name' colspan='2'>{items}</td></tr>")
     return "<table class='education-table'>" + "".join(rows) + "</table>"
 
-def render_engagements():
-    if not os.path.isdir(engagements_dir): return ""
-    parts=[]
-    for fname in sorted(os.listdir(engagements_dir), key=extract_year, reverse=True):
-        if not fname.endswith(".txt"): continue
-        data = parse_engagement(os.path.join(engagements_dir,fname))
-        rows=[]
-        for k,v in data.items():
+def render_engagements() -> str:
+    if not ENGAGEMENTS_DIR.is_dir():
+        return ""
+    parts = []
+    for fname in sorted(ENGAGEMENTS_DIR.iterdir(), key=lambda p: extract_year(p.name), reverse=True):
+        if not fname.is_file() or fname.suffix.lower() != ".txt":
+            continue
+        data = parse_engagement(fname)
+        rows = []
+        for k, v in data.items():
             label = html.escape(pretty_label(k))
             rows.append(f"<tr><td class='label'>{label}</td><td class='value'><div class='tekstblok'>{format_value_for_html(v)}</div></td></tr>")
         parts.append("<table class='engagement-table'>" + "".join(rows) + "</table>")
     return "".join(parts)
 
-# assemble blocks in order
-blocks_html = []
-for b in blocks:
-    name = b["NAME"].lower()
-    title = html.escape((b["TITLE"] or "").upper())
-    content = ""
-    if name in ("personal","persoonlijk"):
-        content = render_personal()
-    elif name in ("education","educations","opleidingen"):
-        content = render_education()
-    elif name in ("courses","cursussen"):
-        content = render_courses()
-    elif name in ("courses_short","courses-short","coursesshort"):
-        content = render_courses()
-    elif name in ("engagements","werkervaring","opdrachten"):
-        content = render_engagements()
-    else:
-        # try to load a block file from blocks/ with same name
-        candidate = os.path.join(blocks_dir, name)
-        if os.path.isfile(candidate):
-            with open(candidate, encoding="utf-8") as bf:
-                content = format_value_for_html(bf.read().strip())
-        elif os.path.isfile(candidate + ".txt"):
-            with open(candidate + ".txt", encoding="utf-8") as bf:
-                content = format_value_for_html(bf.read().strip())
-    # combine: title (bold uppercase) then content; blocks are separated by a thicker light gray line via CSS
-    blocks_html.append(f"<section class='block'><div class='block-title'>{title}</div>{content}</section>")
+# --- main assembly following blocks config order ---
+def build_html():
+    site_logo = find_site_logo()
+    profile = find_profile_image()
+    personal = parse_personal(PERSONAL_DIR)
+    educations = parse_educations(EDUCATION_FILE)
+    courses = parse_courses(COURSES_FILE) + parse_courses_short(COURSES_SHORT_FILE)
+    blocks_cfg = parse_blocks_config()
 
-html_doc = f"""<!doctype html>
-<html lang="nl">
-<head>
-<meta charset="utf-8">
-<title>CV</title>
-<link rel="stylesheet" href="{norm_path_for_html(css_path)}">
-</head>
-<body>
-{"<img src=\"" + html.escape(find_site_logo()) + "\" alt=\"Logo\" class=\"site-logo\" />" if find_site_logo() else ""}
-<div class="container">
-{"".join(blocks_html)}
-<h1>WERKERVARING</h1>
-{render_engagements()}
-</div>
-</body>
-</html>
-"""
+    blocks_html = []
+    render_map = {
+        "personal": lambda: render_personal(personal),
+        "education": lambda: render_educations(educations),
+        "education/educations": lambda: render_educations(educations),
+        "courses": lambda: render_courses(parse_courses(COURSES_FILE)),
+        "courses_short": lambda: render_courses(parse_courses_short(COURSES_SHORT_FILE)),
+        "engagements": render_engagements
+    }
 
-with open(output_file, "w", encoding="utf-8") as f:
-    f.write(html_doc)
+    for b in blocks_cfg:
+        name = b["NAME"].strip()
+        key = name.lower().replace(".txt", "").replace("-", "_")
+        title = html.escape((b.get("TITLE") or name).upper())
+        content_html = ""
+        if key in render_map:
+            content_html = render_map[key]()
+        else:
+            candidate = BLOCKS_DIR / name
+            if not candidate.exists():
+                candidate = BLOCKS_DIR / (name + ".txt")
+            if candidate.exists():
+                with candidate.open(encoding="utf-8") as f:
+                    content_html = format_value_for_html(f.read().strip())
+        blocks_html.append(f"<section class='block'><div class='block-title'>{title}</div>{content_html}</section>")
 
-print("Gegeneerd:", output_file)
+    html_doc = [
+        "<!doctype html>",
+        "<html lang='nl'>",
+        "<head>",
+        "  <meta charset='utf-8'>",
+        "  <meta name='viewport' content='width=device-width,initial-scale=1'/>",
+        "  <title>CV</title>",
+        f"  <link rel='stylesheet' href='{norm_path_for_html(str(CSS_PATH))}'>",
+        "</head>",
+        "<body>",
+    ]
+    if site_logo:
+        html_doc.append(f"<img src=\"{html.escape(site_logo)}\" alt=\"Logo\" class=\"site-logo\" />")
+    html_doc.append("<div class='container'>")
+    html_doc.extend(blocks_html)
+    html_doc.append("<h1>WERKERVARING</h1>")
+    html_doc.append(render_engagements())
+    html_doc.append("</div></body></html>")
+    return "\n".join(html_doc)
+
+if __name__ == "__main__":
+    out = build_html()
+    OUTPUT_FILE.write_text(out, encoding="utf-8")
+    print(f"Generated: {OUTPUT_FILE}")

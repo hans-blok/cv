@@ -1,0 +1,31 @@
+# Functionele specificatie (hoog niveau)
+
+Doel
+- Genereer één eenvoudige, minimalistische CV-pagina (cv.html) uit plain-text bronbestanden.
+- Alles links uitlijnen, consistente lettergrootte, minimale visuele ruis.
+
+Input / output
+- Input: mappen en bestanden (personal/, education/, courses/, courses-short/, engagements/, blocks/, static/blocks.txt, pictures/).
+- Output: cv.html + gebruik van static/style.css en images uit pictures/.
+
+Belangrijkste functionele eisen
+- Volgorde: persoonlijke gegevens -> opleidingen -> cursussen -> blocks (volg order in static/blocks.txt) -> WERKERVARING -> engagements (ieder engagement aparte tabel).
+- Blocks: static/blocks.txt bepaalt welke block-bestanden uit blocks/ getoond worden en in welke volgorde; titel in blocks.txt wordt getoond in hoofdletters en vet.
+- Opleidingen: twee-rijen patroon: regel 1 = periode | opleiding (— instituut) | plaats; regel 2 (optioneel) = toelichting die onder de opleiding uitlijnt en colspan gebruikt.
+- Cursussen: both courses.txt en courses-short.txt ondersteunen; items worden per periode weergegeven en opleidingen binnen een periode gescheiden met ", ".
+- Engagements: bestanden in engagements/ met inhoud in secties aangeduid door volledige HOOFDLETTERS regels; bekende keys worden weergegeven als "Periode, Organisatie, Functie, Werkzaamheden, Belangrijkste prestaties".
+- Afbeeldingen: strikt voorgeschreven bestandsnamen: pictures/logo.png en pictures/profile.jpg (met fallback-regels).
+- HTML-escaping en linkificatie voor URLs en e‑mails.
+- Bullets (•) worden naar <ul><li>…</li></ul>; lege regels => nieuwe paragrafen.
+
+Validatie & foutafhandeling
+- Ontbrekende optionele bestanden => overslaan zonder abort.
+- Ontbrekende verplichte afbeeldingen => fallback zoeken; log waarschuwing naar console.
+- Blocks-config regelt alleen bestanden die bestaan; niet-bestaande entries worden genegeerd met melding.
+
+Gebruikersstroom
+- Run: python generate_site.py in projectroot -> genereer cv.html -> open in browser.
+
+Niet-functioneel
+- Eenvoudig, snel, geen externe afhankelijkheden behalve Python stdlib.
+- Veilig: alle data HTML-escaped.
