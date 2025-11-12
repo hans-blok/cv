@@ -1,7 +1,6 @@
-`year|`name|`learning_institute
+`year`|`name`|`learning_institute`
 2025|Git Fundamentals|Vijfhart
-2024|ArchiMate® 3 training course – Foundation and Practitioner
-Archimate certified|Vijfhart
+2024|ArchiMate® 3 training course – Foundation and Practitioner|Vijfhart
 2024|Service API Specialist Combined Certification Exam (Honors)|Arcitura
 2024|Digital Transformation Specialist (Honors)|Arcitura
 2022|Certificering SAFe@ 5 Architect|Scaled Agile Inc

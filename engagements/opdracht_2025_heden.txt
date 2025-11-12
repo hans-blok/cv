@@ -1,18 +1,15 @@
-ORGANISATIE
-Gemeente Almelo
+`organization_name|`job_title`
+Gemeente Almelo|ICT-Architect
 
-FUNCTIE
-ICT-Architect
+`text_block_work`|
+• Architectuurfunctie volwassen gemaakt: proces voor schrijven PSA verbeterd. Solution Architectuur onderdeel gemaakt van het wijzigingsproces (als onderdeel van een team). 
+• Referentie- en domeinarchitecturen opgesteld en; ArchiMate-modellen in BlueDolphin.
+• Missie, visie en strategie voor Automatiseringsmanagement uitgewerkt (infra & technisch applicatiebeheer) en vertaald naar roadmaps en standaarden.
+• Solution architectuur voor implementatie nieuwe portal voor inwoners.
+• Verbeterde samenhang tussen infrastructuur, applicaties en dienstverlening; focus op betrouwbaarheid, beveiliging en beheersbaarheid.
 
-WERKZAAMHEDEN
-•	Architectuurfunctie volwassen gemaakt: proces voor schrijven PSA verbeterd. Solution Architectuur onderdeel gemaakt van het wijzigingsproces (als onderdeel van een team). 
-•	Referentie- en domeinarchitecturen opgesteld en; ArchiMate-modellen in BlueDolphin.
-•	Missie, visie en strategie voor Automatiseringsmanagement uitgewerkt (infra & technisch applicatiebeheer) en vertaald naar roadmaps en standaarden.
-•	Solution architectuur voor implementatie nieuwe portal voor inwoners.
-•	Verbeterde samenhang tussen infrastructuur, applicaties en dienstverlening; focus op betrouwbaarheid, beveiliging en beheersbaarheid.
+`text_block_achievements`|
+• Architectuurdenken verankerd in de organisatie door een reeks minicursussen en praktische templates; teams betrekken nu vroegtijdig architectuur en besluiten worden vastgelegd met ADR’s.
 
-BELANGRIJKSTE PRESTATIES
-•	Architectuurdenken verankerd in de organisatie door een reeks minicursussen en praktische templates; teams betrekken nu vroegtijdig architectuur en besluiten worden vastgelegd met ADR’s.
-
-TREFWOORDEN
+`text_block_keywords`|
 GEMMA, Common Ground, BlueDolphin, Digitalisering overheid, Federatieve Service Connectiviteit (FSC), API-Gateway

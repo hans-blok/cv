@@ -1,71 +1,87 @@
-/* Minimalistisch: tabellen zonder interne lijnen; blokscheiders lichtgrijs en dikker */
+/* Responsive CV: block-title bold+uppercase (R3), labels bold (R6), logo/photo closer to text */
+
 :root{
-  --bg:#ffffff;
+  --bg:#fff;
   --text:#111;
   --muted:#666;
-  --font-family: "Univers", Arial, sans-serif;
+  --font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-size:11pt;
-  --max-width:1000px;
-  --block-sep:#efefef;
+  --max-width:960px;
+  --block-sep:#ececec;
   --block-sep-width:3px;
-  --section-sep:#e6e6e6;
+  --engagement-sep:#efefef;
+  --gap:10px;
 }
 
-/* base */
 html,body{height:100%}
 body{
-  margin:28px;
+  margin:14px;
   font-family:var(--font-family);
   font-size:var(--font-size);
   color:var(--text);
   background:var(--bg);
   line-height:1.45;
-  text-align:left;
+  font-weight:400;
 }
 
-/* logo */
-.site-logo{position:absolute;top:18px;left:18px;width:150px;height:auto;object-fit:contain}
+/* logo & generated time, compact and near content */
+.logo-area{position:relative;padding-bottom:6px;margin-bottom:6px}
+.site-logo{position:absolute;top:6px;left:6px;width:140px;height:auto;object-fit:contain}
+.generated{position:absolute;left:6px;top:calc(6px + 100% + 4px);font-size:0.82em;color:var(--muted)}
+.generated.no-logo{position:relative;margin-bottom:6px;font-size:0.82em;color:var(--muted)}
 
-/* container */
-.container{max-width:var(--max-width);margin:0 auto}
+.container{max-width:var(--max-width);margin:0 auto;padding-top:40px;padding-left:12px;padding-right:12px}
 
-/* headings */
-h1,h2{font-weight:700;margin:10px 0;color:#000;font-size:inherit;line-height:1.2;padding-bottom:6px;margin-bottom:12px;border-bottom:1px solid var(--section-sep)}
+/* block title */
+.block{margin-bottom:10px;padding-bottom:6px}
+.block-title{font-weight:700;text-transform:uppercase;margin:0 0 6px 0}
 
-/* block: title bold uppercase, then content; block has thicker light separator */
-.block{margin-bottom:16px;padding-bottom:10px;border-bottom:var(--block-sep-width) solid var(--block-sep)}
-.block-title{font-weight:700;text-transform:uppercase;margin:0 0 8px 0}
+/* separator */
+.block-sep{height:var(--block-sep-width);background:var(--block-sep);margin:8px 0}
 
-/* tables minimal: no internal borders; spacing only */
-table{width:100%;border-collapse:collapse;margin-bottom:12px;background:transparent}
+/* tables */
+table{width:100%;border-collapse:collapse;margin-bottom:8px;background:transparent}
 tr{vertical-align:top}
-td{padding:6px 8px;vertical-align:top;border:none;text-align:left}
+td{padding:6px 6px;vertical-align:top;border:none;text-align:left}
 
-/* label column */
-td.label{width:20%;font-weight:700;color:var(--muted);padding-right:8px;white-space:nowrap;text-align:left}
-
-/* value / content column */
+/* label column: bold per spec (R6) */
+td.label{width:22%;font-weight:700;color:var(--muted);padding-right:8px;white-space:nowrap;text-align:left}
 td.value{padding-left:6px}
+
+/* personal block: photo close to text */
+.personal-block{display:flex;align-items:flex-start;gap:8px}
+.personal-table-wrap{flex:1}
+.profile-photo{width:110px;height:110px;object-fit:cover;border-radius:6px;flex:0 0 110px;align-self:flex-start;margin-left:6px}
 
 /* education specifics */
 .education-table td.edu-name{font-weight:700;padding-left:6px;text-align:left}
 .education-table td.edu-place{color:var(--muted);padding-left:8px;text-align:left}
 .education-table td.edu-desc{padding-left:6px}
 
-/* engagement tables: separate each engagement by a very light line */
-.engagement-table{margin-bottom:18px;border-bottom:1px solid var(--section-sep);padding-bottom:8px}
+/* engagements */
+.engagement-table{margin-bottom:14px;border-bottom:1px solid var(--engagement-sep);padding-bottom:8px}
 
-/* text blocks */
+/* tekstblok formatting */
 .tekstblok{white-space:pre-wrap;margin:0;padding:0;font-family:inherit;line-height:1.45}
 .tekstblok p{margin:0 0 0.6em 0}
-.tekstblok ul{margin:0.2em 0 0.6em 1.15em;padding-left:0}
+.tekstblok ul{margin:0.2em 0 0.6em 1.15em;padding-left:1.15em}
 .tekstblok li{margin:0.25em 0}
 
-/* responsive */
+/* responsive rules */
+@media (max-width:900px){
+  .site-logo{width:120px;left:6px;top:6px}
+  .profile-photo{width:96px;height:96px;flex:0 0 96px}
+  .container{padding-top:32px}
+}
 @media (max-width:700px){
-  body{margin:14px;font-size:11pt}
+  body{margin:8px;font-size:10.5pt}
   td.label{display:block;width:100%;font-size:10pt;padding-bottom:6px;text-align:left}
-  td{display:block;padding:8px 0}
-  .site-logo{position:relative;top:0;left:0;width:120px;margin-bottom:8px}
-  .personal{flex-direction:column}
+  td{display:block;padding:6px 0}
+  .site-logo{position:relative;top:0;left:0;width:110px;margin-bottom:6px}
+  .generated{position:relative;top:0;left:0}
+  .personal-block{flex-direction:column;gap:6px}
+  .profile-photo{width:84px;height:84px;align-self:flex-end;margin-left:0}
+  .education-table td.edu-place{display:block;padding-left:0;margin-top:4px}
+  .education-table td.edu-desc{padding-left:0}
+  .container{padding-top:16px}
 }

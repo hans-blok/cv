@@ -2,50 +2,51 @@
 
 
 # entities are in capital
-# attributes start with a `
-# (example) indicate the tag to be written in de html when applicable (dutch)
+# attributes are included by `
+# (example) indicate the tag to be written in de html when applicable
+# tags are written in dutch
 
  BLOCK
- `name
- `title
+ `name`
+ `title`
  
 PERSONAL
-`name (naam)
-`usual_name (roepnaam)
-`place_of_residence (woonplaats)
-`data_of_birth (geboortedatum)
-'available (beschikbaar)
-`function (functie)
-`linkedin_url (linkedin)
-`website_url (website)
-`github_url (github)
+`name` (naam)
+`usual_name` (roepnaam)
+`place_of_residence` (woonplaats)
+`date_of_birth` (geboortedatum)
+`available` (beschikbaar)
+`job_title` (functie)
+`linkedin_url` (linkedin)
+`website_url` (website)
+`github_url` (github)
 
 EDUCATION (opleidingen)
-`period
-`name 
-`learning_institute
-`place
-`addition
+`period`
+`name` 
+`learning_institute`
+`place`
+`addition`
 
 CERTIFICATION (belangrijkste certficeringen)
-`year_of_certification
-`name
-`organization
+`year`
+`name`
+`organization`
 
 ENGAGEMENT (werkervaring)
-`period (periode)
-'organization_name (organisatie)
-'function (functie)
-'text_block_work (werkzaamheden)
-'text_block_achievements (belangrijkste prestaties)
-'text_block_keywords (belangrijkste prestaties)
+`period` (periode)
+`organization_name` (organisatie)
+`job_title` (functie)
+`text_block_work` (werkzaamheden)
+`text_block_achievements` (belangrijkste prestaties)
+`text_block_keywords` (belangrijkste prestaties)
 
  COURSE
- 'year
- 'name
- 'learning_institute
+ `year`
+ `name`
+ `learning_institute`
  
 COURSES-SHORT
-`period
-`text_various_courses
-`text_block
+`period`
+`text_various_courses`
+`text_block`
