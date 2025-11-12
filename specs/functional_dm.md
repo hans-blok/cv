@@ -4,6 +4,7 @@
 # entities are in capital
 # attributes are included by `
 # (example) indicate the tag to be written in de html when applicable
+   eg. 'text_block_work` (werkzaamheden) means that in the html werkzaamheden is shown and not 'text_block_work` 
 # tags are written in dutch
 
  BLOCK

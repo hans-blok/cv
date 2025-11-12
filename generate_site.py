@@ -9,7 +9,8 @@ ENGAGEMENTS_DIR = ROOT / "engagements"
 PERSONAL_DIR = ROOT / "personal"
 EDUCATION_FILE = ROOT / "education" / "educations.txt"
 COURSES_FILE = ROOT / "courses" / "courses.txt"
-COURSES_SHORT_FILE = ROOT / "courses" / "courses-short.txt"
+COURSES_SHORT_FILE = ROOT / "courses-short" / "courses-short.txt"
+CERTIFICATIONS_FILE = ROOT / "certifications" / "certifications.txt"
 BLOCKS_DIR = ROOT / "blocks"
 BLOCKS_CONFIG = ROOT / "static" / "blocks.txt"
 FUNCTIONAL_DM = ROOT / "specs" / "functional_dm.md"
@@ -200,13 +201,35 @@ def parse_educations(path: Path):
         out.append({"PERIODE":period,"NAAM":name,"INSTITUUT":institute,"PLAATS":place,"TOEL":addition})
     return out
 
-def parse_courses(path: Path):
+def parse_certifications(path: Path):
+    """Parse a simple certifications table with columns: year|name|organization
+    and return a list of dicts compatible with render_education_block (PERIODE, NAAM, INSTITUUT).
+    """
     out = []
     rows = parse_simple_table(path, skip_header=True)
     for parts in rows:
         period = parts[0] if len(parts)>0 else ""
+        name = parts[1] if len(parts)>1 else ""
+        org = parts[2] if len(parts)>2 else ""
+        out.append({"PERIODE":period,"NAAM":name,"INSTITUUT":org,"PLAATS":"","TOEL":""})
+    return out
+
+def parse_courses(path: Path):
+    out = []
+    rows = parse_simple_table(path, skip_header=True)
+    # Group courses by year/period, maintaining order of first appearance
+    periods_dict = {}
+    periods_order = []
+    for parts in rows:
+        period = parts[0] if len(parts)>0 else ""
         items = parts[1:] if len(parts)>1 else []
-        out.append({"PERIODE":period,"ITEMS":items})
+        if period not in periods_dict:
+            periods_dict[period] = []
+            periods_order.append(period)
+        periods_dict[period].extend(items)
+    # Convert back to list of dicts, maintaining order of first appearance
+    for period in periods_order:
+        out.append({"PERIODE":period,"ITEMS":periods_dict[period]})
     return out
 
 def parse_courses_short(path: Path):
@@ -309,11 +332,18 @@ def render_education_block(eds):
     return "<table class='education-table'>" + "".join(rows) + "</table>"
 
 def render_certifications_block(eds):
+    # Render certifications without bold (no edu-name class).
     if not eds: return ""
-    certs = [e for e in eds if re.search(r'certif|cert\.', (e.get("NAAM","") + " " + e.get("INSTITUUT","")), re.I)]
-    if not certs:
-        certs = eds
-    return render_education_block(certs)
+    rows = []
+    for ed in eds:
+        peri = html.escape(ed.get("PERIODE",""))
+        naam = html.escape(ed.get("NAAM","") + (f" — {ed.get('INSTITUUT','')}" if ed.get("INSTITUUT") else ""))
+        plaats = html.escape(ed.get("PLAATS",""))
+        toel = format_value_for_html(ed.get("TOEL",""))
+        rows.append(f"<tr><td class='label'>{peri}</td><td>{naam}</td><td class='edu-place'>{plaats}</td></tr>")
+        if toel:
+            rows.append(f"<tr><td class='label'>&nbsp;</td><td colspan='2'><div class='tekstblok'>{toel}</div></td></tr>")
+    return "<table class='education-table'>" + "".join(rows) + "</table>"
 
 def render_courses_block(rows):
     if not rows: return ""
@@ -321,7 +351,7 @@ def render_courses_block(rows):
     for r in rows:
         peri = html.escape(r.get("PERIODE",""))
         items_html = ", ".join(html.escape(i) for i in r.get("ITEMS",[]))
-        out.append(f"<table class='education-table'><tr><td class='label'>{peri}</td><td class='edu-name' colspan='2'><div class='tekstblok'>{linkify(items_html)}</div></td></tr></table>")
+        out.append(f"<table class='education-table'><tr><td class='label'>{peri}</td><td colspan='2'><div class='tekstblok'>{linkify(items_html)}</div></td></tr></table>")
     return "".join(out)
 
 def render_courses_short_block(rows):
@@ -331,7 +361,7 @@ def render_courses_short_block(rows):
         peri = html.escape(r.get("PERIODE",""))
         items = r.get("ITEMS",[])
         items_html = ", ".join(item.strip() for item in items)
-        parts.append(f"<table class='education-table'><tr><td class='label'>{peri}</td><td class='edu-name' colspan='2'><div class='tekstblok'>{linkify(items_html)}</div></td></tr></table>")
+    parts.append(f"<table class='education-table'><tr><td class='label'>{peri}</td><td colspan='2'><div class='tekstblok'>{linkify(items_html)}</div></td></tr></table>")
     return "".join(parts)
 
 def render_engagements_block():
@@ -371,7 +401,12 @@ def render_one_engagement(path: Path):
     for k,v in data.items():
         nk = normalize_key(k)
         if nk in handled: continue
-        label = resolve_label(k.strip().strip("`"))
+        # Strip backticks from the key before resolving its label
+        k_clean = k.strip().strip("`").strip()
+        # Only show keys that are actually in the tag map (skip raw backtick keys)
+        if k_clean.lower() not in [t.lower() for t in TAG_MAP.keys()]:
+            continue
+        label = resolve_label(k_clean)
         rows.append(f"<tr><td class='label'>{html.escape(label)}</td><td class='value'><div class='tekstblok'>{format_value_for_html(v)}</div></td></tr>")
     return "<table class='engagement-table'>" + "".join(rows) + "</table>"
 
@@ -400,6 +435,7 @@ def build_html():
     profile = find_first(PROFILE_CANDIDATES)
     personal = parse_personal(PERSONAL_DIR)
     educations = parse_educations(EDUCATION_FILE)
+    certifications = parse_certifications(CERTIFICATIONS_FILE)
     courses = parse_courses(COURSES_FILE)
     courses_short = parse_courses_short(COURSES_SHORT_FILE)
     cfg = parse_blocks_config()
@@ -441,7 +477,7 @@ def build_html():
         elif name in ("education","educations","opleidingen"):
             out.append(render_education_block(educations))
         elif name in ("certifications","certificeringen"):
-            out.append(render_certifications_block(educations))
+            out.append(render_certifications_block(certifications))
         elif name in ("courses","cursussen"):
             out.append(render_courses_block(courses))
         elif name in ("courses_short","courses-short","overige_cursussen","coursesshort"):
@@ -455,8 +491,6 @@ def build_html():
         out.append("</section>")
         out.append("<div class='block-sep'></div>")
 
-    out.append("<h1>WERKERVARING</h1>")
-    out.append(render_engagements_block())
     out.append("</div></body></html>")
     return "\n".join(out)
 

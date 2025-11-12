@@ -1,5 +1,5 @@
-`organization_name|`job_title`
-Gemeente Almelo|ICT-Architect
+`organization_name'|Gemeente Almelo
+`job_title`|ICT-Architect
 
 `text_block_work`|
 • Architectuurfunctie volwassen gemaakt: proces voor schrijven PSA verbeterd. Solution Architectuur onderdeel gemaakt van het wijzigingsproces (als onderdeel van een team). 

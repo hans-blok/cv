@@ -1,5 +1,6 @@
-`organization_name`|`job_title`
-Belastingdienst (Inkomensheffing)|Solution architect
+`organization_name`|Belastingdienst (Inkomensheffing)
+
+`job_title`|Solution architect
 
 `text_block_work`|
 • Medeverantwoordelijk voor het definiëren van standaarden, ondersteunen van drie agile-teams bij het realiseren van features en bewaken van de kaders. 
