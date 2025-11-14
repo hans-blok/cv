@@ -1,6 +1,7 @@
 import os
 import re
 import html
+import base64
 from pathlib import Path
 from datetime import datetime
 
@@ -51,6 +52,33 @@ PRETTY_KEYS = {
 
 def norm(p: str) -> str:
     return p.replace("\\", "/")
+
+def image_to_base64(image_path: str) -> str:
+    """Convert image file to base64 data URI"""
+    if not image_path:
+        return ""
+    
+    path = Path(image_path)
+    if not path.is_file():
+        return ""
+    
+    # Determine MIME type from extension
+    ext = path.suffix.lower()
+    mime_types = {
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+        '.webp': 'image/webp'
+    }
+    mime_type = mime_types.get(ext, 'image/jpeg')
+    
+    # Read and encode image
+    with open(path, 'rb') as f:
+        img_data = f.read()
+    b64_data = base64.b64encode(img_data).decode('utf-8')
+    
+    return f"data:{mime_type};base64,{b64_data}"
 
 def find_first(cands):
     for c in cands:
@@ -350,9 +378,10 @@ def render_personal(personal: dict, profile_img: str):
     if not personal and not profile_img:
         return ""
     rows = []
-    # Order keys - look for Dutch keys in personal.txt which match the personal entity definition
-    # personal.txt has: Naam, Roepnaam, Woonplaats, Geboortedatum, Telefoon, Beschikbaar per, Functie
-    order_keys = ["Naam", "Roepnaam", "Woonplaats", "Geboortedatum", "Telefoon", "Beschikbaar per ", "Functie", "LinkedIn", "Website", "GitHub"]
+    # Order keys based on personal-data.txt structure
+    # personal-data.txt has: Naam, Roepnaam, Woonplaats, Geboortedatum, Beschikbaar per, Functie
+    # Note: URLs (LinkedIn, Website, GitHub) are now in urls-contact.txt and rendered in sidebar
+    order_keys = ["Naam", "Roepnaam", "Woonplaats", "Geboortedatum", "Telefoon", "Beschikbaar per ", "Functie"]
     
     handled_keys = set()
     for key in order_keys:
@@ -370,7 +399,9 @@ def render_personal(personal: dict, profile_img: str):
         rows.append(f"<tr><td class='label'>{html.escape(label)}</td><td class='value'><div class='tekstblok'>{format_value_for_html(v)}</div></td></tr>")
     
     table = "<table class='personal-table'>" + "".join(rows) + "</table>"
-    photo = f'<img src="{html.escape(profile_img)}" alt="Foto" class="profile-photo">' if profile_img else ""
+    # Convert profile image to base64 if present
+    photo_src = image_to_base64(profile_img) if profile_img else ""
+    photo = f'<img src="{photo_src}" alt="Foto" class="profile-photo">' if photo_src else ""
     # Table first, then photo on the right
     return f'<div class="personal-block"><div class="personal-table-wrap">{table}</div>{photo}</div>'
 
@@ -380,9 +411,11 @@ def render_urls_sidebar(urls: dict, logo: str = ""):
         return ""
     out = ['<aside class="urls-sidebar">']
     
-    # Add logo at the top of sidebar
+    # Add logo at the top of sidebar - convert to base64
     if logo:
-        out.append(f'<div class="sidebar-logo"><img src="{html.escape(logo)}" alt="Logo" class="sidebar-logo-img"/></div>')
+        logo_src = image_to_base64(logo)
+        if logo_src:
+            out.append(f'<div class="sidebar-logo"><img src="{logo_src}" alt="Logo" class="sidebar-logo-img"/></div>')
     
     # Define order and configuration for contact items with display labels
     contact_items = [

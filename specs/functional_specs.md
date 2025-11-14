@@ -124,4 +124,4 @@ FUNCTION:write_subblock_engagements
 &  
 
 content is not in the header but at the bottom in grey
-WRITE now() FORMAT "DD MMMM YYYY HH:mm:ss"
+WRITE now() FORMAT "DD MMMM YYYY"

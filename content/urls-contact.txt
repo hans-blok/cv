@@ -1,5 +1,5 @@
 'linkedin_url'| https://www.linkedin.com/in/hans-blok/
 'website_url' | https://www.2-minuten-it-architectuur.nl/
-'github_url'  | https://github.com/hans-blok/cv.git
+'github_url'  | https://github.com/hans-blok
 'phone_nr'    | 06 3045 1822
 'e-mail'      | hans.blok@the-future-group.com
