@@ -1,0 +1,358 @@
+/* CV Stylesheet - Generated from rules.md specifications */
+
+:root {
+  --text-primary: #111;
+  --text-muted: #636e72;     /* RULE 15: tags and block color */
+  --bg-primary: #fff;
+  --sep-block: #b2bec3;       /* RULE 15: lines between blocks */
+  --sep-course: #dfe6e9;      /* RULE 16: lines between courses */
+  --font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-size: 11pt;
+  --max-width: 960px;
+}
+
+/* Logo area - RULE 11 */
+.logo-area {
+  text-align: center;
+  padding: 14px 0;
+  margin-bottom: 8px;
+}
+
+.site-logo {
+  max-width: 800px;            /* 4x larger than before (was 200px) */
+  height: auto;
+  max-height: 240px;           /* 4x larger than before (was 60px) */
+}
+
+/* Icons for different contact types with brand colors */
+.contact-link[data-type="linkedin"]::before {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%230A66C2"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.39v-1.2h-2.5v8.5h2.5v-4.74c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.74h2.5M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.5H5.5v8.5h2.77z"/></svg>');
+}
+
+.contact-link[data-type="github"]::before {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23181717"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.41 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.12-1.47-1.12-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.93 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02.8-.22 1.65-.33 2.5-.33s1.7.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.83-2.34 4.68-4.57 4.93.36.31.69.92.69 1.85v2.74c0 .26.18.58.69.48C19.14 20.16 22 16.42 22 12c0-5.52-4.48-10-10-10z"/></svg>');
+}
+
+.contact-link[data-type="website"]::before {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2374b9ff"><path d="M16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2m-5.15 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 0 1-4.33 3.56M14.34 14H9.66c-.1-.66-.16-1.32-.16-2 0-.68.06-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2M12 19.96c-.83-1.2-1.5-2.53-1.91-3.96h3.82c-.41 1.43-1.08 2.76-1.91 3.96M8 8H5.08A7.923 7.923 0 0 1 9.4 4.44C8.8 5.55 8.35 6.75 8 8m-2.92 8H8c.35 1.25.8 2.45 1.4 3.56A8.008 8.008 0 0 1 5.08 16m-.82-2C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2M12 4.03c.83 1.2 1.5 2.54 1.91 3.97h-3.82c.41-1.43 1.08-2.77 1.91-3.97M18.92 8h-2.95a15.65 15.65 0 0 0-1.38-3.56c1.84.63 3.37 1.9 4.33 3.56M12 2C6.47 2 2 6.5 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z"/></svg>');
+}
+
+.contact-link[data-type="phone"]::before {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2300b894"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>');
+}
+
+.contact-link[data-type="email"]::before {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%230072C6"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>');
+}
+
+
+
+body {
+  margin: 14px;
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  line-height: 1.15;           /* RULE 8: line-height in blocks */
+  font-weight: 400;            /* RULE 14: none of the content is bold */
+}
+
+/* Container layout */
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding-top: 0;
+  padding-left: 12px;
+  padding-right: 12px;
+  display: flex;
+  gap: 16px;                   /* Smaller gap for URLs closer to content */
+  align-items: flex-start;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* URLs Sidebar combined styles */
+.urls-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  background: transparent;
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
+}
+
+/* Logo in sidebar */
+.sidebar-logo {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.sidebar-logo-img {
+  max-width: 100%;
+  height: auto;
+  max-height: 120px;
+}
+
+/* Contact links with icon and text */
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  color: var(--text-dark);
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  font-size: 0.9em;
+}
+
+.contact-link:hover {
+  background-color: #f0f0f0;
+}
+
+.contact-link::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.contact-text {
+  color: var(--text-dark);
+}
+
+/* Generated timestamp */
+.generated {
+  font-size: 0.82em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+/* Block structure */
+.block {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* RULE 3: Block titles - uppercase, grey, bold */
+.block-title {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 6px 0;
+}
+
+/* RULE 15 & RULE 17: Block separator lines with symmetric spacing */
+.block-sep {
+  height: 1px;
+  background: var(--sep-block);
+  margin: 12px 0;              /* RULE 17: equal spacing above and below */
+}
+
+/* Table base styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+  background: transparent;
+}
+
+tr {
+  vertical-align: top;
+}
+
+td {
+  padding: 6px 6px;
+  vertical-align: top;
+  border: none;
+  text-align: left;
+}
+
+/* RULE 6: Tags (labels) shall be written in bold */
+td.label {
+  width: 22%;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding-right: 8px;
+  white-space: nowrap;
+  text-align: left;
+}
+
+td.value {
+  padding-left: 6px;
+  font-weight: 400;            /* RULE 14: content not bold */
+}
+
+/* Personal block */
+.personal-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-direction: row;
+}
+
+.personal-table-wrap {
+  flex: 1;
+}
+
+.profile-photo {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex: 0 0 110px;
+  align-self: flex-start;
+  margin-left: 12px;
+}
+
+/* Education table specifics */
+.education-table td.edu-name {
+  font-weight: 400;            /* RULE 14: education name not bold */
+  padding-left: 6px;
+  text-align: left;
+}
+
+.education-table td.edu-place {
+  color: var(--text-muted);
+  padding-left: 8px;
+  text-align: left;
+}
+
+.education-table td.edu-desc {
+  padding-left: 6px;
+  font-weight: 400;            /* RULE 14: description not bold */
+}
+
+/* Engagement table - RULE 16: separator lines */
+.engagement-table {
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--sep-course);
+  padding-bottom: 8px;
+}
+
+/* Text block formatting */
+.tekstblok {
+  white-space: pre-wrap;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+  line-height: 1.4;            /* RULE 8: line spacing */
+  font-weight: 400;            /* RULE 14: content not bold */
+}
+
+.tekstblok p {
+  margin: 0 0 0.6em 0;
+}
+
+.tekstblok ul {
+  margin: 0.2em 0 0.6em 1.15em;
+  padding-left: 1.15em;
+}
+
+.tekstblok li {
+  margin: 0.25em 0;
+  font-weight: 400;            /* RULE 14: list content not bold */
+}
+
+/* RULE 9: Line spacing between blocks 1.6 */
+.block + .block-sep + .block {
+  margin-top: 0.2em;
+}
+
+/* Responsive design - RULE 10 */
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .urls-sidebar {
+    width: 100%;
+    position: static;
+    order: -1;
+    border-top: 1px solid var(--sep-block);
+    border-bottom: 1px solid var(--sep-block);
+    padding: 12px 0;
+  }
+  
+  .main-content {
+    width: 100%;
+  }
+  
+  .profile-photo {
+    width: 96px;
+    height: 96px;
+    flex: 0 0 96px;
+  }
+  
+  .container {
+    padding-top: 32px;
+  }
+  
+  .site-logo {
+    max-width: 400px;
+    max-height: 120px;
+  }
+}
+
+@media (max-width: 700px) {
+  body {
+    margin: 8px;
+    font-size: 10.5pt;
+  }
+  
+  td.label {
+    display: block;
+    width: 100%;
+    font-size: 10pt;
+    padding-bottom: 6px;
+    text-align: left;
+  }
+  
+  td {
+    display: block;
+    padding: 6px 0;
+  }
+  
+  .personal-block {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .profile-photo {
+    width: 84px;
+    height: 84px;
+    align-self: flex-start;
+    margin-right: 0;
+  }
+  
+  .site-logo {
+    max-width: 300px;
+    max-height: 90px;
+  }
+  
+  .education-table td.edu-place {
+    display: block;
+    padding-left: 0;
+    margin-top: 4px;
+  }
+  
+  .education-table td.edu-desc {
+    padding-left: 0;
+  }
+  
+  .container {
+    padding-top: 16px;
+  }
+}
