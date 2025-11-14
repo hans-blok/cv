@@ -1,0 +1,6 @@
+Naam|Johannes Blok
+Roepnaam|Hans
+Woonplaats|Wijk bij Duurstede
+Geboortedatum|3 januari 1971
+Beschikbaar per |1 januari 2026
+Functie|IT-Architect

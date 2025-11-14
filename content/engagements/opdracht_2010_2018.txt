@@ -1,0 +1,14 @@
+`organization_name`|Stater
+
+`job_title`|IT-architect
+
+`text_block_work`|
+Sinds 2011 heb ik bij Stater de IT-architectuurfunctie opgezet en geborgd (DYA ingevoerd, PSA-template/proces ingericht, en tussen 2013–2017 de governance geleid als secretaris van de Architectuur Board, domeinarchitecten aangestuurd en ~80 collega’s getraind in PSA-schrijven (samen met business-architecten volgens TOGAF).
+Als programma-/projectarchitect (o.a. ABN AMRO Hypotheken) definieerde en implementeerde ik de integratie-architectuur voor de digitalisering van het hypotheekproces (portal & mobile) en borgde ik GDPR-richtlijnen, 24/7-architectuur en DAMA-datavolwassenheid.
+In 2017 heb ik met een kernteam de referentiearchitectuur voor digitale transformatie opgesteld (Iconic Customer Journey, STP/papierloos,) en de organisatie begeleid van twee monolieten naar microservices, terwijl ik met R&D en klanten blockchain-toepassingen onderzocht en via events een coalitie rondom deze innovaties bouwde.
+
+`text_block_achievements`|
+In 2010 ben ik gevraagd om IT-architectuur in te richten bij een kleine IT organisatie. In 2018 zijn er zes IT-architecten in functie bij Stater, ligt er een door Gartner als kwalitatief zeer goed beoordeelde referentiearchitectuur voor digitale transformatie en is IT-architectuur vanzelfsprekend in de inmiddels middelgrote IT-organisatie.
+
+`text_block_keywords`|
+DYA,PSA, Digitalisering, migratie van monoliet naar microservices

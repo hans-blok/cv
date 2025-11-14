@@ -1,0 +1,12 @@
+`organization_name`|Atos Origin
+
+`job_title`|Application Developer
+
+`text_block_work`|
+Sinds 1997 werkte ik als COBOL-programmeur (Rabobank Effectendiensten). In 1999 ben ik omgeschoold tot Oracle-developer. Ik ben gestart met een opdracht met end-to-end verantwoordelijkheid voor applicatie-onderhoud bij de Rijksarchiefdiensten (ontwerp, realisatie, test, releases, DBA, implementaties in NL/BE).
+Vanaf 2001 was ik ontwikkelaar in het onderhoudsteam van een energieleverancier en initieerde ik continue verbetering, waaronder het automatiseren van OTAP-releases voor de billing-applicatie.
+
+`text_block_achievements`|
+Continu verbeterproces vormgegeven voor het uitvoeren van applicatieonderhoud (ITIL). Als jong talent ook ingezet bij Atos Origin om landelijk verbeteringen door te voeren.
+`text_block_keywords`|
+Oracle, ITIL, biling-applicatie, bankwezen, energiesector

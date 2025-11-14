@@ -1,0 +1,12 @@
+`organization_name`|Belastingdienst (Inkomensheffing)
+
+`job_title`|Solution architect
+
+`text_block_work`|
+In het hoofdontwerpteam Inkomensheffing was ik medeverantwoordelijk voor het beschrijven van de solution op basis van de domeinarchitectuur; ik heb het team versterkt door een SOA-certificeringstraject te initiëren en de principes direct in de praktijk te brengen. Als projectarchitect voor Inkomensheffing was ik aanspreekpunt voor regelanalyse vraagstukken. Mijn kerntaken bestonden uit het opstellen van van impactanalyses en het  vastleggen van een referentie architectuur voor het realiseren van een service georiënteerd landschap.
+
+`text_block_achievements`|
+Met mijn uitgebreide kennis van ontwikkeling van een service georiënteerd landschap heb ik de architecten van de IH enthousiast kunnen maken om dit complexe vraagstuk aan te pakken.
+
+`text_block_keywords`|
+Service Oriented Architecture, Regelanalyse, impactanalyse

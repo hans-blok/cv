@@ -11,16 +11,23 @@
  `name`
  `title`
  
-PERSONAL
-`name` (naam)
-`usual_name` (roepnaam)
-`place_of_residence` (woonplaats)
-`date_of_birth` (geboortedatum)
-`available` (beschikbaar)
-`job_title` (functie)
-`linkedin_url` (linkedin)
-`website_url` (website)
-`github_url` (github)
+URLS_CONTACT (urls are written without with text specified in functional_specs.md)
+`linkedin_url`
+`website_url` 
+`github_url` 
+`phone_nr`
+`e-mail`
+
+PERSONAL-DATA
+`name` (Naam)
+`usual_name` (Roepnaam)
+`place_of_residence` (Woonplaats)
+`date_of_birth` (Geboortedatum)
+`job_title` (Functie)
+`available_per` (Beschikbaar per)
+
+PERSONAL-TEXT
+`text_block_personal` 
 
 EDUCATION (opleidingen)
 `period`

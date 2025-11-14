@@ -1,0 +1,16 @@
+`organization_name`|Belastingdienst (Omzetbelasting)
+
+`job_title`|Lead Architect programma
+
+`text_block_work`|
+• Werkzaam als Lead architect in een programma met als doel de implementatie van Europese wetgeving in het te moderniseren IT-landschap in het domein van de Omzetbelasting. In die rol heb ik een belangrijke bijdrage kunnen leveren in de herijking van de domeinarchitectuur op het gebied van technologie.
+
+• In de rol van architect heb ik de programma Solution Architectuur afgerond en afgestemd met de stakeholders waaronder Directie Belastingdienst en de Directeur-Generaal. Verantwoordelijk voor het definiëren van architectuur enablers in een SAFE-omgeving en het voorbereiden van de PI-events samen met de product manager. 
+
+• Aanspreekpunt van de Agile-teams voor het realiseren van de story’s. In de rol als programma architect heb ik verschillende presentaties gegeven, een film gemaakt en een workshop georganiseerd.
+
+`text_block_achievements`|
+Herziening van de technologiekeuzes waarbij de doeltechnologie is herzien. Daarnaast heb ik de keuzes op het gebied van orkestratie en asynchrone verwerkingen en communicatiepatronen vastgelegd en uitgedragen aan de teams.
+
+`text_block_keywords`|
+Service Oriented Architecture, SAFE, migratie monolithisch systeem naar microservices, micro frontend, IAM

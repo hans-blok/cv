@@ -5,20 +5,23 @@ from pathlib import Path
 from datetime import datetime
 
 ROOT = Path(__file__).resolve().parent
-ENGAGEMENTS_DIR = ROOT / "engagements"
-PERSONAL_DIR = ROOT / "personal"
-EDUCATION_FILE = ROOT / "education" / "educations.txt"
-COURSES_FILE = ROOT / "courses" / "courses.txt"
-COURSES_SHORT_FILE = ROOT / "courses-short" / "courses-short.txt"
-CERTIFICATIONS_FILE = ROOT / "certifications" / "certifications.txt"
-BLOCKS_DIR = ROOT / "blocks"
-BLOCKS_CONFIG = ROOT / "static" / "blocks.txt"
+CONTENT_DIR = ROOT / "content"
+ENGAGEMENTS_DIR = CONTENT_DIR / "engagements"
+PERSONAL_DATA_FILE = CONTENT_DIR / "personal-data.txt"
+PERSONAL_TEXT_FILE = CONTENT_DIR / "personal-text.txt"
+URLS_FILE = CONTENT_DIR / "urls-contact.txt"
+EDUCATION_FILE = CONTENT_DIR / "educations.txt"
+COURSES_FILE = CONTENT_DIR / "courses.txt"
+COURSES_SHORT_FILE = CONTENT_DIR / "courses-short.txt"
+CERTIFICATIONS_FILE = CONTENT_DIR / "certifications.txt"
+BLOCKS_DIR = CONTENT_DIR / "blocks"
+BLOCKS_CONFIG = CONTENT_DIR / "blocks.txt"
 FUNCTIONAL_DM = ROOT / "specs" / "functional_dm.md"
 CSS_PATH = Path("static") / "style.css"
 OUTPUT_FILE = ROOT / "cv.html"
 
-LOGO_CANDIDATES = ["pictures/logo-header.png", "pictures/logo-header.jpg", "pictures/logo.png", "pictures/logo.jpg"]
-PROFILE_CANDIDATES = ["pictures/profile-photo.jpg", "pictures/profile-photo.png", "pictures/profile.jpg", "pictures/profile.png"]
+LOGO_CANDIDATES = ["content/pictures/logo-header.png", "content/pictures/logo-header.jpg", "content/pictures/logo.png", "content/pictures/logo.jpg"]
+PROFILE_CANDIDATES = ["content/pictures/profile-photo.jpg", "content/pictures/profile-photo.png", "content/pictures/profile.jpg", "content/pictures/profile.png"]
 LOGO_DIRS = ["pictures", "logos", "logo", "images", "static/images"]
 
 _URL_RE = re.compile(r"(https?://[^\s<>]+|www\.[^\s<>]+|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})")
@@ -32,7 +35,9 @@ PREFERRED_CASING = {
     "place_of_residence": "Woonplaats",
     "date_of_birth": "Geboortedatum",
     "available": "Beschikbaar",
-    "job_title": "Functie"
+    "job_title": "Functie",
+    "telefoon": "Telefoon",
+    "beschikbaar per": "Beschikbaar per"
 }
 
 PRETTY_KEYS = {
@@ -120,6 +125,7 @@ def load_tag_map():
     if not FUNCTIONAL_DM.is_file():
         return tag_map
     txt = FUNCTIONAL_DM.read_text(encoding="utf-8")
+    # Parse `key` (label) patterns - these are the primary mappings
     for m in re.finditer(r"`([^`]+)`\s*\(([^)]+)\)", txt):
         key = m.group(1).strip()
         label = m.group(2).strip()
@@ -127,10 +133,22 @@ def load_tag_map():
         if pc:
             label = pc
         tag_map[key] = label
+        # Also add reverse mapping: Dutch label -> Dutch label (so Naam maps to Naam)
+        tag_map[label] = label
+    # Parse backtick-wrapped keys without labels
     for m in re.finditer(r"`([^`]+)`(?!\s*\()", txt):
         key = m.group(1).strip()
         if key not in tag_map:
             tag_map[key] = PREFERRED_CASING.get(key.lower(), key.capitalize())
+    # Parse lines like: name (label) without backticks
+    for m in re.finditer(r"^([A-Za-z0-9_]+)\s*\(([^)]+)\)", txt, re.M):
+        key = m.group(1).strip()
+        label = m.group(2).strip()
+        if key not in tag_map:
+            pc = PREFERRED_CASING.get(key.lower())
+            tag_map[key] = pc if pc else (label.capitalize() if label else key.capitalize())
+        # Also add reverse mapping
+        tag_map[label] = label
     return tag_map
 
 TAG_MAP = load_tag_map()
@@ -138,30 +156,34 @@ TAG_MAP = load_tag_map()
 def resolve_label(key: str) -> str:
     if not key:
         return ""
+    # Try exact match in tag map first
     if key in TAG_MAP:
         return TAG_MAP[key]
+    # Try case-insensitive match
     lk = key.lower()
     for k,v in TAG_MAP.items():
         if k.lower() == lk:
             return v
-    for k,v in TAG_MAP.items():
-        if v.lower() == key.strip().lower():
-            return v
-    return PREFERRED_CASING.get(lk, key.strip().capitalize())
+    # Check PREFERRED_CASING for short known names (LinkedIn, GitHub, etc.)
+    fallback = PREFERRED_CASING.get(lk)
+    if fallback:
+        return fallback
+    # Default: return nicely capitalized label
+    return key.strip().capitalize() if key else ""
 
 def is_attribute_header(line: str) -> bool:
     if not line:
         return False
     st = line.strip()
-    if st.startswith("`") and "`" in st:
+    # Explicit backtick-wrapped headers (e.g., `year`|`name`|...)
+    if st.startswith("`") and "`" in st and "|" in st:
         return True
-    if "|" in st and "`" in st:
-        return True
+    # Lines explicitly starting with "attribute" keyword
     if st.lower().startswith("attribute"):
         return True
     return False
 
-def parse_personal(directory: Path):
+def parse_personal(path: Path):
     data = {}
     def process_text(txt):
         for ln in txt.splitlines():
@@ -169,14 +191,29 @@ def parse_personal(directory: Path):
             if "|" not in ln: continue
             k,v = [p.strip() for p in ln.split("|",1)]
             data[k] = v
-    if directory.is_dir():
-        for f in sorted(directory.iterdir()):
-            if not f.is_file(): continue
+    # If path is a directory, read personal.txt from it; otherwise read the file directly
+    if path.is_dir():
+        f = path / "personal.txt"
+        if f.is_file():
             process_text(f.read_text(encoding="utf-8"))
-    else:
-        p = ROOT / "personal.txt"
-        if p.is_file():
-            process_text(p.read_text(encoding="utf-8"))
+    elif path.is_file():
+        process_text(path.read_text(encoding="utf-8"))
+    return data
+
+def parse_urls(path: Path):
+    """Parse URLs file (linkedin, website, github)"""
+    data = {}
+    if not path.is_file():
+        return data
+    for ln in path.read_text(encoding="utf-8").splitlines():
+        if not ln.strip() or is_attribute_header(ln):
+            continue
+        if "|" not in ln:
+            continue
+        k, v = [p.strip() for p in ln.split("|", 1)]
+        # Strip backticks and quotes from key
+        k = k.strip("`'\"").strip()
+        data[k] = v.strip()
     return data
 
 def parse_simple_table(path: Path, skip_header=True):
@@ -253,33 +290,43 @@ def parse_engagement_file(path: Path):
     txt = path.read_text(encoding="utf-8")
     lines = [l.rstrip() for l in txt.splitlines()]
     data = {}
-    cur = None; buf = []
+    cur = None
+    buf = []
+    
     for ln in lines:
         s = ln.strip()
-        # header detection: uppercase-ish or lines that end with ':' or backtick-enclosed keys
-        letters = re.sub(r'[^A-Za-z]', '', s)
-        is_header = False
-        if s and not s.startswith("•"):
-            if letters and letters == letters.upper() and len(letters) >= 2:
-                is_header = True
-            elif s.endswith(":") and len(s) < 60:
-                is_header = True
-            elif s.startswith("`") and "`" in s:
-                is_header = True
-        if is_header:
+        if not s:  # skip empty lines
+            continue
+            
+        # Check for pipe-separated key|value format: `key`|value or key|value
+        if "|" in s:
+            parts = s.split("|", 1)
+            key = parts[0].strip().strip("`").strip("'").strip()
+            value = parts[1].strip() if len(parts) > 1 else ""
+            
+            # Save previous key's buffer if any
             if cur:
                 data[cur] = "\n".join(buf).strip()
-            # normalize header key: strip trailing ':' and backticks
-            cur = s.rstrip(":").strip().strip("`")
-            buf = []
+            
+            cur = key
+            buf = [value] if value else []
+        # Bullet point or continuation - add to current buffer
+        elif s.startswith("•") or (cur and not "|" in s):
+            if cur:
+                buf.append(ln)
         else:
-            buf.append(ln)
+            # Unknown line format - skip
+            pass
+    
+    # Save last key's buffer
     if cur:
         data[cur] = "\n".join(buf).strip()
-    # ensure period key (if not present) from filename
+    
+    # Ensure period key from filename
     period = path.name.replace("opdracht_","").replace(".txt","").replace("_"," – ")
-    if "PERIODE" not in data and "Periode" not in data:
-        data["PERIODE"] = period
+    if "period" not in data and "periode" not in data and "PERIODE" not in data:
+        data["periode"] = period
+    
     return data
 
 def normalize_key(k: str) -> str:
@@ -290,7 +337,7 @@ ENG_SYNONYMS = {
     "werkzaamheden": ["werkzaamheden","work","workdetails","textblockwork","text_block_work","work_description"],
     "prestaties": ["belangrijksteprestaties","achievements","achievements_text","text_block_achievements","achievements_list"],
     "trefwoorden": ["trefwoorden","keywords","text_block_keywords","keywords_list"],
-    "organisatie": ["organisatie","organisatie_naam","organization","employer"]
+    "organisatie": ["organisatie","organisatie_naam","organization","organization_name","employer"]
 }
 
 def find_data_for_variant(data: dict, variants: list):
@@ -303,18 +350,98 @@ def render_personal(personal: dict, profile_img: str):
     if not personal and not profile_img:
         return ""
     rows = []
-    order_keys = ["name","usual_name","place_of_residence","date_of_birth","available","job_title","linkedin_url","website_url","github_url"]
+    # Order keys - look for Dutch keys in personal.txt which match the personal entity definition
+    # personal.txt has: Naam, Roepnaam, Woonplaats, Geboortedatum, Telefoon, Beschikbaar per, Functie
+    order_keys = ["Naam", "Roepnaam", "Woonplaats", "Geboortedatum", "Telefoon", "Beschikbaar per ", "Functie", "LinkedIn", "Website", "GitHub"]
+    
+    handled_keys = set()
     for key in order_keys:
         if key in personal:
-            rows.append(f"<tr><td class='label'>{html.escape(resolve_label(key))}</td><td class='value'><div class='tekstblok'>{format_value_for_html(personal[key])}</div></td></tr>")
+            val = personal[key]
+            label = resolve_label(key)
+            rows.append(f"<tr><td class='label'>{html.escape(label)}</td><td class='value'><div class='tekstblok'>{format_value_for_html(val)}</div></td></tr>")
+            handled_keys.add(key)
+    
+    # Render remaining keys that weren't in the ordered list
     for k,v in personal.items():
-        if k in order_keys: continue
+        if k in handled_keys: continue
         kk = k.strip().strip("`")
-        label = resolve_label(kk) if kk in TAG_MAP else kk.capitalize()
+        label = resolve_label(kk)
         rows.append(f"<tr><td class='label'>{html.escape(label)}</td><td class='value'><div class='tekstblok'>{format_value_for_html(v)}</div></td></tr>")
+    
     table = "<table class='personal-table'>" + "".join(rows) + "</table>"
     photo = f'<img src="{html.escape(profile_img)}" alt="Foto" class="profile-photo">' if profile_img else ""
+    # Table first, then photo on the right
     return f'<div class="personal-block"><div class="personal-table-wrap">{table}</div>{photo}</div>'
+
+def render_urls_sidebar(urls: dict, logo: str = ""):
+    """Render URLs in sidebar format (RULE 13 & RULE 18)"""
+    if not urls and not logo:
+        return ""
+    out = ['<aside class="urls-sidebar">']
+    
+    # Add logo at the top of sidebar
+    if logo:
+        out.append(f'<div class="sidebar-logo"><img src="{html.escape(logo)}" alt="Logo" class="sidebar-logo-img"/></div>')
+    
+    # Define order and configuration for contact items with display labels
+    contact_items = [
+        ("linkedin_url", "linkedin", "https://", "LinkedIn"),
+        ("linkedin", "linkedin", "https://", "LinkedIn"),
+        ("website_url", "website", "https://", "Website"),
+        ("website", "website", "https://", "Website"),
+        ("github_url", "github", "https://", "GitHub"),
+        ("github", "github", "https://", "GitHub"),
+        ("phone_nr", "phone", "tel:", ""),  # Show actual number
+        ("phone-nr", "phone", "tel:", ""),
+        ("telefoon", "phone", "tel:", ""),
+        ("telephone", "phone", "tel:", ""),
+        ("e-mail", "email", "mailto:", ""),  # Show actual email
+        ("email", "email", "mailto:", ""),
+    ]
+    
+    # Track which URLs have been rendered to avoid duplicates
+    rendered = set()
+    
+    for key, val in urls.items():
+        if not val:
+            continue
+            
+        key_lower = key.strip("'\"").lower().replace("_", "-")
+        
+        # Skip if already rendered
+        if key_lower in rendered:
+            continue
+        
+        # Find matching contact item
+        icon_name = None
+        href_prefix = ""
+        display_label = ""
+        for item_key, item_icon, item_prefix, item_label in contact_items:
+            if key_lower == item_key.lower().replace("_", "-"):
+                icon_name = item_icon
+                href_prefix = item_prefix
+                display_label = item_label if item_label else val  # Use actual value if no label
+                # Mark all variants as rendered
+                rendered.add(key_lower)
+                for k, i, p, l in contact_items:
+                    if i == item_icon:
+                        rendered.add(k.lower().replace("_", "-"))
+                break
+        
+        if not icon_name:
+            icon_name = key_lower
+            href_prefix = ""
+            display_label = val
+            rendered.add(key_lower)
+        
+        # Create href with proper prefix
+        href = val if val.startswith(('http://', 'https://', 'tel:', 'mailto:')) else href_prefix + val
+        # Contact link with icon and text label
+        out.append(f'<a href="{html.escape(href)}" class="contact-link" data-type="{icon_name}" title="{html.escape(val)}"><span class="contact-text">{html.escape(display_label)}</span></a>')
+    
+    out.append('</aside>')
+    return "\n".join(out) if len(out) > 2 else ""
 
 def render_education_block(eds):
     if not eds: return ""
@@ -374,49 +501,53 @@ def render_engagements_block():
 
 def render_one_engagement(path: Path):
     data = parse_engagement_file(path)
-    normalized = {normalize_key(k): v for k,v in data.items()}
+    normalized = {normalize_key(k): (k, v) for k,v in data.items()}
+    
     def get_variant(variants):
         for v in variants:
             nv = normalize_key(v)
             if nv in normalized:
-                return normalized[nv]
+                return normalized[nv][1]  # return value only
         return None
+    
     order = [
         ("periode", ["periode","PERIODE"]),
+        ("organisatie", ENG_SYNONYMS["organisatie"]),
         ("functie", ENG_SYNONYMS["functie"]),
         ("werkzaamheden", ENG_SYNONYMS["werkzaamheden"]),
         ("prestaties", ENG_SYNONYMS["prestaties"]),
-        ("trefwoorden", ENG_SYNONYMS["trefwoorden"]),
-        ("organisatie", ENG_SYNONYMS["organisatie"])
+        ("trefwoorden", ENG_SYNONYMS["trefwoorden"])
     ]
+    
     rows = []
     handled = set()
+    
+    # Render in predefined order
     for canon, variants in order:
         val = get_variant(variants)
         if val:
             label = PRETTY_KEYS.get(canon.upper(), resolve_label(canon))
             rows.append(f"<tr><td class='label'>{html.escape(label)}</td><td class='value'><div class='tekstblok'>{format_value_for_html(val)}</div></td></tr>")
             handled.add(normalize_key(canon))
-    # append remaining blocks (preserve order in file)
-    for k,v in data.items():
-        nk = normalize_key(k)
-        if nk in handled: continue
-        # Strip backticks from the key before resolving its label
-        k_clean = k.strip().strip("`").strip()
-        # Only show keys that are actually in the tag map (skip raw backtick keys)
-        if k_clean.lower() not in [t.lower() for t in TAG_MAP.keys()]:
-            continue
-        label = resolve_label(k_clean)
-        rows.append(f"<tr><td class='label'>{html.escape(label)}</td><td class='value'><div class='tekstblok'>{format_value_for_html(v)}</div></td></tr>")
+    
+    # Only render handled fields - no extra fields
     return "<table class='engagement-table'>" + "".join(rows) + "</table>"
 
 def load_block_text(name: str):
+    # First try BLOCKS_DIR (content/blocks/)
     c = BLOCKS_DIR / name
     if c.exists() and c.is_file():
         return c.read_text(encoding="utf-8").strip()
     c2 = BLOCKS_DIR / (name + ".txt")
     if c2.exists() and c2.is_file():
         return c2.read_text(encoding="utf-8").strip()
+    # Then try CONTENT_DIR directly (content/)
+    c3 = CONTENT_DIR / name
+    if c3.exists() and c3.is_file():
+        return c3.read_text(encoding="utf-8").strip()
+    c4 = CONTENT_DIR / (name + ".txt")
+    if c4.exists() and c4.is_file():
+        return c4.read_text(encoding="utf-8").strip()
     return ""
 
 def parse_blocks_config():
@@ -433,7 +564,8 @@ def parse_blocks_config():
 def build_html():
     logo = find_first(LOGO_CANDIDATES)
     profile = find_first(PROFILE_CANDIDATES)
-    personal = parse_personal(PERSONAL_DIR)
+    personal = parse_personal(PERSONAL_DATA_FILE)
+    urls = parse_urls(URLS_FILE)
     educations = parse_educations(EDUCATION_FILE)
     certifications = parse_certifications(CERTIFICATIONS_FILE)
     courses = parse_courses(COURSES_FILE)
@@ -442,7 +574,7 @@ def build_html():
 
     if not cfg:
         cfg = [
-            {"name":"personal","title":"Persoonlijk"},
+            {"name":"personal","title":"PERSOONLIJK"},
             {"name":"education","title":"OPLEIDINGEN"},
             {"name":"certifications","title":"CERTIFICERINGEN"},
             {"name":"courses","title":"CURSUSSEN"},
@@ -451,7 +583,7 @@ def build_html():
         ]
     else:
         names = [b["name"].strip().lower().replace(".txt","") for b in cfg]
-        if "personal" not in names and "persoonlijk" not in names and personal:
+        if "personal" not in names and "personal-data" not in names and "persoonlijk" not in names and personal:
             cfg.insert(0, {"name":"personal","title":"Persoonlijk"})
 
     now = datetime.now().strftime("%d %B %Y %H:%M:%S")
@@ -459,21 +591,39 @@ def build_html():
     out.append("<!doctype html><html lang='nl'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'/>")
     out.append(f"<title>CV</title><link rel='stylesheet' href='{norm(str(CSS_PATH))}'>")
     out.append("</head><body>")
-    if logo:
-        out.append(f"<div class='logo-area'><img src='{html.escape(logo)}' class='site-logo' alt='Logo'/><div class='generated'>{html.escape(now)}</div></div>")
-    else:
-        out.append(f"<div class='generated no-logo'>{html.escape(now)}</div>")
+    
+    # Container with sidebar and main content
     out.append("<div class='container'>")
+    
+    # Sidebar with logo and contact info (RULE 13, RULE 18)
+    urls_sidebar = render_urls_sidebar(urls, logo)
+    if urls_sidebar:
+        out.append(urls_sidebar)
+    
+    # Main content wrapper
+    out.append("<div class='main-content'>")
 
-    for b in cfg:
+    for i, b in enumerate(cfg):
         title = (b.get("title") or "").strip()
+        name = b.get("name","").strip().lower()
+        
+        # Skip urls - already rendered in sidebar (RULE 13)
+        if name in ("urls","urls_sidebar"):
+            continue
+            
         if title:
             out.append(f"<section class='block'><div class='block-title'>{html.escape(title.upper())}</div>")
         else:
             out.append("<section class='block'>")
-        name = b.get("name","").strip().lower()
-        if name in ("personal","persoonlijk"):
+        
+        if name in ("personal","persoonlijk","personal-data"):
+            # Render personal data table with profile photo
             out.append(render_personal(personal, profile))
+        elif name in ("personal-text","persoonlijke-tekst"):
+            # Render personal text block if exists
+            txt = load_block_text("personal-text")
+            if txt:
+                out.append(f"<div class='tekstblok'>{format_value_for_html(txt)}</div>")
         elif name in ("education","educations","opleidingen"):
             out.append(render_education_block(educations))
         elif name in ("certifications","certificeringen"):
@@ -489,9 +639,14 @@ def build_html():
             if txt:
                 out.append(f"<div class='tekstblok'>{format_value_for_html(txt)}</div>")
         out.append("</section>")
-        out.append("<div class='block-sep'></div>")
+        # Only add separator if not the last block
+        if i < len(cfg) - 1:
+            out.append("<div class='block-sep'></div>")
 
-    out.append("</div></body></html>")
+    out.append("</div>")  # Close main-content
+    out.append("</div>")  # Close container
+    out.append(f"<div class='generated'>{html.escape(now)}</div>")
+    out.append("</body></html>")
     return "\n".join(out)
 
 if __name__ == "__main__":

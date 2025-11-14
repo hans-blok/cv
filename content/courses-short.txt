@@ -1,7 +1,4 @@
 `period|`text_various_courses
-1997-2010
-
-`text_block
 Mastering the Requirements Process (Volere)
 Woningfinanciering I
 Prince 2 Foundation 

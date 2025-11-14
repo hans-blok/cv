@@ -1,5 +1,7 @@
-personal|
-education|OPLEIDINGEN
+urls
+personal-data|PERSOONLIJKE GEGEVENS
+personal-text|PERSOONLIJK
+educations|OPLEIDINGEN
 certifications|BELANGRIJKSTE CERTIFICERINGEN
 courses|CURSUSSEN
 courses-short|OVERIGE CURSUSSEN
