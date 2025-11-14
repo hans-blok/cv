@@ -189,6 +189,11 @@ td.label {
   text-align: left;
 }
 
+/* Jaartallen nooit vet */
+td.label:first-child {
+  font-weight: 400;
+}
+
 td.value {
   padding-left: 6px;
   font-weight: 400;            /* RULE 14: content not bold */
@@ -234,7 +239,95 @@ td.value {
   font-weight: 400;            /* RULE 14: description not bold */
 }
 
-/* Engagement table - RULE 16: separator lines */
+/* Engagement collapsible items - RULE 20 */
+.engagement-item {
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--sep-course);
+  padding-bottom: 8px;
+}
+
+.engagement-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  user-select: none;
+}
+
+.engagement-summary:hover {
+  background-color: #f5f5f5;
+}
+
+.engagement-summary:focus {
+  outline: 2px solid #0A66C2;
+  outline-offset: 2px;
+}
+
+.engagement-toggle {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  transition: transform 0.3s ease;
+  display: inline-block;
+  min-width: 12px;
+}
+
+.engagement-summary[aria-expanded="true"] .engagement-toggle {
+  transform: rotate(90deg);
+}
+
+.engagement-summary-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.engagement-period {
+  color: var(--text-muted);
+  font-weight: 400;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.engagement-org {
+  font-weight: 400;
+  flex: 1;
+}
+
+.engagement-role {
+  font-weight: 400;
+  margin-left: auto;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.engagement-details {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding: 0 0 0 20px;
+}
+
+.engagement-summary[aria-expanded="true"] + .engagement-details {
+  max-height: 2000px;
+  padding-top: 12px;
+}
+
+.engagement-detail-item {
+  margin-bottom: 12px;
+}
+
+.detail-label {
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 4px;
+  font-size: 0.95em;
+}
+
+/* Legacy engagement table support (deprecated) */
 .engagement-table {
   margin-bottom: 14px;
   border-bottom: 1px solid var(--sep-course);

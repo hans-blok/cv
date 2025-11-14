@@ -86,6 +86,7 @@ The urls are written in the sidebare at the left
 [RULE 14]
 None of the content is bold
 EXAMPLE the name of the education is not written bold
+Years and dates shall never be printed in bold (font-weight: 400)
 
 [RULE 15]
 The colour of the tags and block shall have colour code  #636e72 (HEX)
@@ -109,3 +110,17 @@ GitHub: #181717 (GitHub zwart)
 Email: #0072C6 (Microsoft Outlook blauw)
 Phone: #00b894 (groen)
 Website: #74b9ff (lichtblauw)
+
+[RULE 20]
+Engagements shall be collapsible/expandable.
+By default, only the summary (period, organization_name, job_title) is visible.
+The details (text_block_work, text_block_achievements, text_block_keywords) are hidden and can be expanded by clicking.
+Each engagement shall have:
+- A visible summary line showing: period  organization_name  job_title (without separator characters)
+- The job_title shall be right-aligned (not italic)
+- A collapse/expand indicator (▶ when collapsed, ▼ when expanded)
+- Hidden detail section containing: werkzaamheden, belangrijkste prestaties, trefwoorden
+- Click anywhere on the summary line to toggle expand/collapse
+- Smooth transition animation (0.3s) when expanding/collapsing
+- Accessible with keyboard (Enter/Space to toggle)
+- ARIA attributes for screen readers (aria-expanded, role="button")

@@ -543,28 +543,56 @@ def render_one_engagement(path: Path):
                 return normalized[nv][1]  # return value only
         return None
     
-    order = [
-        ("periode", ["periode","PERIODE"]),
-        ("organisatie", ENG_SYNONYMS["organisatie"]),
-        ("functie", ENG_SYNONYMS["functie"]),
-        ("werkzaamheden", ENG_SYNONYMS["werkzaamheden"]),
-        ("prestaties", ENG_SYNONYMS["prestaties"]),
-        ("trefwoorden", ENG_SYNONYMS["trefwoorden"])
-    ]
+    # Get summary data (always visible)
+    periode = get_variant(["periode","PERIODE"])
+    organisatie = get_variant(ENG_SYNONYMS["organisatie"])
+    functie = get_variant(ENG_SYNONYMS["functie"])
     
-    rows = []
-    handled = set()
+    # Get detail data (collapsible)
+    werkzaamheden = get_variant(ENG_SYNONYMS["werkzaamheden"])
+    prestaties = get_variant(ENG_SYNONYMS["prestaties"])
+    trefwoorden = get_variant(ENG_SYNONYMS["trefwoorden"])
     
-    # Render in predefined order
-    for canon, variants in order:
-        val = get_variant(variants)
-        if val:
-            label = PRETTY_KEYS.get(canon.upper(), resolve_label(canon))
-            rows.append(f"<tr><td class='label'>{html.escape(label)}</td><td class='value'><div class='tekstblok'>{format_value_for_html(val)}</div></td></tr>")
-            handled.add(normalize_key(canon))
+    # Build collapsible engagement HTML (RULE 20)
+    out = ['<div class="engagement-item">']
     
-    # Only render handled fields - no extra fields
-    return "<table class='engagement-table'>" + "".join(rows) + "</table>"
+    # Summary line (always visible, clickable)
+    out.append('<div class="engagement-summary" role="button" tabindex="0" aria-expanded="false">')
+    out.append('<span class="engagement-toggle">▶</span>')
+    out.append('<div class="engagement-summary-content">')
+    
+    if periode:
+        out.append(f'<span class="engagement-period">{html.escape(periode)}</span>')
+    if organisatie:
+        out.append(f'<span class="engagement-org">{html.escape(organisatie)}</span>')
+    if functie:
+        out.append(f'<span class="engagement-role">{html.escape(functie)}</span>')
+    
+    out.append('</div>')  # Close engagement-summary-content
+    out.append('</div>')  # Close engagement-summary
+    
+    # Detail section (hidden by default)
+    out.append('<div class="engagement-details">')
+    
+    if werkzaamheden:
+        label = PRETTY_KEYS.get("WERKZAAMHEDEN", "Werkzaamheden")
+        out.append(f'<div class="engagement-detail-item"><div class="detail-label">{html.escape(label)}</div>')
+        out.append(f'<div class="tekstblok">{format_value_for_html(werkzaamheden)}</div></div>')
+    
+    if prestaties:
+        label = PRETTY_KEYS.get("BELANGRIJKSTE PRESTATIES", "Belangrijkste prestaties")
+        out.append(f'<div class="engagement-detail-item"><div class="detail-label">{html.escape(label)}</div>')
+        out.append(f'<div class="tekstblok">{format_value_for_html(prestaties)}</div></div>')
+    
+    if trefwoorden:
+        label = PRETTY_KEYS.get("TREFWOORDEN", "Trefwoorden")
+        out.append(f'<div class="engagement-detail-item"><div class="detail-label">{html.escape(label)}</div>')
+        out.append(f'<div class="tekstblok">{format_value_for_html(trefwoorden)}</div></div>')
+    
+    out.append('</div>')  # Close engagement-details
+    out.append('</div>')  # Close engagement-item
+    
+    return "".join(out)
 
 def load_block_text(name: str):
     # First try BLOCKS_DIR (content/blocks/)
@@ -679,6 +707,35 @@ def build_html():
     out.append("</div>")  # Close main-content
     out.append("</div>")  # Close container
     out.append(f"<div class='generated'>{html.escape(now)}</div>")
+    
+    # Add JavaScript for collapsible engagements (RULE 20)
+    out.append("<script>")
+    out.append("""
+document.addEventListener('DOMContentLoaded', function() {
+  const summaries = document.querySelectorAll('.engagement-summary');
+  
+  summaries.forEach(summary => {
+    // Click handler
+    summary.addEventListener('click', function() {
+      toggleEngagement(this);
+    });
+    
+    // Keyboard handler (Enter or Space)
+    summary.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleEngagement(this);
+      }
+    });
+  });
+  
+  function toggleEngagement(summary) {
+    const expanded = summary.getAttribute('aria-expanded') === 'true';
+    summary.setAttribute('aria-expanded', !expanded);
+  }
+});
+""")
+    out.append("</script>")
     out.append("</body></html>")
     return "\n".join(out)
 
