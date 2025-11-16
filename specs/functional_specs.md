@@ -80,6 +80,7 @@ FUNCTION:write_education
   DO FOR EACH e IN instances in (EDUCATIONS)
     WRITE_LINE `e.period`, `e.name`,`e.place`
     WRITE_LINE `e.addition` outlined with `e.name`
+    WRITE_LINE thin light grey line AFTER `e.addition`
 END DO
 &
 

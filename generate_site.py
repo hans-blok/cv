@@ -478,17 +478,22 @@ def render_urls_sidebar(urls: dict, logo: str = ""):
 
 def render_education_block(eds):
     if not eds: return ""
-    max_chars = max((len(ed.get("NAAM","") + ed.get("INSTITUUT","")) for ed in eds), default=20)
-    min_ch = max_chars + 2
     rows = []
     for ed in eds:
         peri = html.escape(ed.get("PERIODE",""))
-        naam = html.escape(ed.get("NAAM","") + (f" — {ed.get('INSTITUUT','')}" if ed.get("INSTITUUT") else ""))
+        naam = html.escape(ed.get("NAAM",""))
+        instituut = html.escape(ed.get("INSTITUUT",""))
         plaats = html.escape(ed.get("PLAATS",""))
         toel = format_value_for_html(ed.get("TOEL",""))
-        rows.append(f"<tr><td class='label'>{peri}</td><td class='edu-name' style='min-width:{min_ch}ch'>{naam}</td><td class='edu-place'>{plaats}</td></tr>")
+        
+        # First row: periode, naam — instituut, plaats
+        naam_instituut = f"{naam} — {instituut}" if instituut else naam
+        rows.append(f"<tr><td class='label'>{peri}</td><td class='edu-name'>{naam_instituut}</td><td class='edu-place'>{plaats}</td></tr>")
+        
+        # Second row: toelichting if present
         if toel:
-            rows.append(f"<tr><td class='label'>&nbsp;</td><td class='edu-desc'><div class='tekstblok'>{toel}</div></td><td>&nbsp;</td></tr>")
+            rows.append(f"<tr><td class='label'>&nbsp;</td><td class='edu-desc' colspan='2'><div class='tekstblok'>{toel}</div></td></tr>")
+    
     return "<table class='education-table'>" + "".join(rows) + "</table>"
 
 def render_certifications_block(eds):

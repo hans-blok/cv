@@ -231,12 +231,19 @@ td.value {
 .education-table td.edu-place {
   color: var(--text-muted);
   padding-left: 8px;
-  text-align: left;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .education-table td.edu-desc {
   padding-left: 6px;
   font-weight: 400;            /* RULE 14: description not bold */
+  padding-top: 8px;
+}
+
+.education-table td.edu-desc .tekstblok {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--sep-course);
 }
 
 /* Engagement collapsible items - RULE 20 */
@@ -424,14 +431,16 @@ td.value {
   /* Personal data table: keep horizontal layout on smartphone */
   .personal-table-wrap table td.label {
     display: table-cell;
-    width: 35%;
+    width: 40%;
     font-size: 10pt;
     padding-right: 8px;
+    padding-bottom: 6px;
     white-space: nowrap;
   }
   
   .personal-table-wrap table td.value {
     display: table-cell;
+    width: 60%;
     padding: 6px 6px;
   }
   
@@ -452,14 +461,62 @@ td.value {
     max-height: 90px;
   }
   
+  /* Engagement: smartphone vertical layout */
+  .engagement-summary {
+    display: flex;
+    align-items: flex-start;
+    padding: 8px 4px;
+  }
+  
+  .engagement-toggle {
+    flex-shrink: 0;
+    margin-right: 8px;
+    margin-top: 2px;
+  }
+  
+  .engagement-summary-content {
+    display: block;
+    flex: 1;
+  }
+  
+  .engagement-period {
+    display: block;
+    min-width: auto;
+    margin-bottom: 4px;
+  }
+  
+  .engagement-org {
+    display: block;
+    padding-left: 0;
+    margin-bottom: 4px;
+  }
+  
+  .engagement-role {
+    display: block;
+    margin-left: 0 !important;
+    padding-left: 0;
+    text-align: left !important;
+  }
+  
+  /* Education: place on new line, description stays under name */
   .education-table td.edu-place {
     display: block;
     padding-left: 0;
-    margin-top: 4px;
+    margin-top: 2px;
+    text-align: left;
+    white-space: normal;
+  }
+  
+  .education-table td.edu-name {
+    display: block;
+    padding-left: 0;
   }
   
   .education-table td.edu-desc {
+    display: block;
     padding-left: 0;
+    margin-top: 0;
+    padding-top: 0;
   }
   
   .container {
