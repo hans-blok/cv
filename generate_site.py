@@ -488,7 +488,7 @@ def render_education_block(eds):
         toel = format_value_for_html(ed.get("TOEL",""))
         rows.append(f"<tr><td class='label'>{peri}</td><td class='edu-name' style='min-width:{min_ch}ch'>{naam}</td><td class='edu-place'>{plaats}</td></tr>")
         if toel:
-            rows.append(f"<tr><td class='label'>&nbsp;</td><td class='edu-desc' colspan='2'><div class='tekstblok'>{toel}</div></td></tr>")
+            rows.append(f"<tr><td class='label'>&nbsp;</td><td class='edu-desc'><div class='tekstblok'>{toel}</div></td><td>&nbsp;</td></tr>")
     return "<table class='education-table'>" + "".join(rows) + "</table>"
 
 def render_certifications_block(eds):
@@ -648,9 +648,10 @@ def build_html():
             cfg.insert(0, {"name":"personal","title":"Persoonlijk"})
 
     now = datetime.now().strftime("%d %B %Y %H:%M:%S")
+    css_version = datetime.now().strftime("%Y%m%d")  # Cache-busting version for CSS
     out = []
     out.append("<!doctype html><html lang='nl'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'/>")
-    out.append(f"<title>CV</title><link rel='stylesheet' href='{norm(str(CSS_PATH))}'>")
+    out.append(f"<title>CV</title><link rel='stylesheet' href='{norm(str(CSS_PATH))}?v={css_version}'>")
     out.append("</head><body>")
     
     # Container with sidebar and main content

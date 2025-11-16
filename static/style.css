@@ -280,8 +280,8 @@ td.value {
 
 .engagement-summary-content {
   display: flex;
-  align-items: center;
-  gap: 16px;
+  align-items: baseline;
+  gap: 8px;
   flex: 1;
 }
 
@@ -294,11 +294,13 @@ td.value {
 
 .engagement-org {
   font-weight: 400;
+  padding-left: 6px;
   flex: 1;
 }
 
 .engagement-role {
   font-weight: 400;
+  padding-left: 8px;
   margin-left: auto;
   text-align: right;
   flex-shrink: 0;
@@ -405,7 +407,8 @@ td.value {
     font-size: 10.5pt;
   }
   
-  td.label {
+  /* Education/courses/certifications tables: vertical layout */
+  .education-table td.label {
     display: block;
     width: 100%;
     font-size: 10pt;
@@ -413,9 +416,23 @@ td.value {
     text-align: left;
   }
   
-  td {
+  .education-table td {
     display: block;
     padding: 6px 0;
+  }
+  
+  /* Personal data table: keep horizontal layout on smartphone */
+  .personal-table-wrap table td.label {
+    display: table-cell;
+    width: 35%;
+    font-size: 10pt;
+    padding-right: 8px;
+    white-space: nowrap;
+  }
+  
+  .personal-table-wrap table td.value {
+    display: table-cell;
+    padding: 6px 6px;
   }
   
   .personal-block {
