@@ -26,7 +26,7 @@ DO FOR EACH b IN (BLOCKS)
        /write_certifications
        WRITE_LINE light grey line
     ELSE `b.`name` = "education" THEN
-       /write_education
+       /write_educations
        WRITE_LINE light grey line
     ELSE b.`name` = "courses"
        /write_courses
@@ -76,11 +76,11 @@ FUNCTION:write_personal_text
   END DO  
 &
 
-FUNCTION:write_education
+FUNCTION:write_educations
   DO FOR EACH e IN instances in (EDUCATIONS)
     WRITE_LINE `e.period`, `e.name`,`e.place`
     WRITE_LINE `e.addition` outlined with `e.name`
-    WRITE_LINE thin light grey line AFTER `e.addition`
+    WRITE_LINE thin light grey line 
 END DO
 &
 

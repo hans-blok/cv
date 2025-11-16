@@ -242,8 +242,9 @@ td.value {
 }
 
 .education-table td.edu-desc .tekstblok {
-  padding-bottom: 8px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--sep-course);
+  margin-bottom: 8px;
 }
 
 /* Engagement collapsible items - RULE 20 */
