@@ -423,11 +423,6 @@ td.value {
     text-align: left;
   }
   
-  .education-table td {
-    display: block;
-    padding: 6px 0;
-  }
-  
   /* Personal data table: keep horizontal layout on smartphone */
   .personal-table-wrap table td.label {
     display: table-cell;
@@ -499,6 +494,28 @@ td.value {
   }
   
   /* Education: place on new line, description stays under name */
+  .education-table td.label {
+    display: inline-block;
+    padding-left: 0;
+    text-align: left;
+    vertical-align: top;
+    width: auto;
+    margin-right: 8px;
+  }
+  
+  .education-table td {
+    display: inline-block;
+    padding-left: 0;
+    text-align: left;
+    vertical-align: top;
+    width: auto;
+  }
+  
+  .education-table tr {
+    display: block;
+    margin-bottom: 8px;
+  }
+  
   .education-table td.edu-place {
     display: block;
     padding-left: 0;
@@ -517,6 +534,11 @@ td.value {
     padding-left: 0;
     margin-top: 0;
     padding-top: 0;
+  }
+  
+  .education-table td.edu-desc .tekstblok {
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--sep-course);
   }
   
   .container {
