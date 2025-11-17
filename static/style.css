@@ -482,13 +482,17 @@ td.value {
   }
   
   .engagement-org {
-    display: block;
+    display: inline;
     padding-left: 0;
-    margin-bottom: 4px;
+    margin-bottom: 0;
+  }
+  
+  .engagement-org::after {
+    content: " — ";
   }
   
   .engagement-role {
-    display: block;
+    display: inline;
     margin-left: 0 !important;
     padding-left: 0;
     text-align: left !important;

@@ -11,4 +11,4 @@ Zelfstandig analyse en regie uitgevoerd over complexe conversie-issues in onbeke
 Zelfstandig analyse en regie uitgevoerd over complexe conversie-issues in onbekend domein. Succesvolle, grote conversie van hypotheekportefeuille.
 
 `text_block_keywords`|
-Hypotheken, migratie, Data-warehouse
+Hypotheken, migratie hypotheekportefeuille, Data-warehouse
