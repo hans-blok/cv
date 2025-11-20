@@ -418,6 +418,9 @@ def render_urls_sidebar(urls: dict, logo: str = ""):
         if logo_src:
             out.append(f'<div class="sidebar-logo"><img src="{logo_src}" alt="Logo" class="sidebar-logo-img"/></div>')
     
+    # Add PDF download button
+    out.append('<a href="cv.pdf" class="pdf-download-btn" download="cv.pdf">Download PDF</a>')
+    
     # Define order and configuration for contact items with display labels
     contact_items = [
         ("linkedin_url", "linkedin", "https://", "LinkedIn"),

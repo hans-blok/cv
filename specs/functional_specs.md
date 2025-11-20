@@ -44,6 +44,7 @@ END DO FOR EACH
 FUNCTION:write_sidebar
   SEARCH_FILE logo-header.jpg | logo-header.png
   WRITE "logo" 
+  WRITE "Download PDF" button with link to cv.pdf
   /write_urls_contact
 &    
 
