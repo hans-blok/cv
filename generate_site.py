@@ -123,9 +123,10 @@ def format_value_for_html(value: str) -> str:
     def flush_para():
         nonlocal buf
         if buf:
-            txt = " ".join(p.strip() for p in buf).strip()
+            # Join lines with <br> to preserve hard returns
+            txt = "<br>".join(linkify(p.strip()) for p in buf if p.strip())
             if txt:
-                out.append(f"<p>{linkify(txt)}</p>")
+                out.append(f"<p>{txt}</p>")
             buf = []
     for ln in lines:
         s = ln.strip()

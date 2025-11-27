@@ -1,10 +1,10 @@
-1. Strategie naar werkende software met Agile (Java)-teams
+1. Strategie naar werkende software met Agile (Java)-teams.
 Veel organisaties hebben een duidelijke visie of roadmap. Ik zorg ervoor dat die strategie ook écht landt in de ontwikkelteams.
 Ik help product owners en management om scherpe, haalbare keuzes te maken. Samen met Agile (Java)-teams richt ik software-architectuur, ontwikkelstraat en technische standaarden zo in dat teams zelfstandig, voorspelbaar en met kwaliteit kunnen leveren.
 
 Het resultaat: minder discussie, meer focus, gemotiveerde teams én merkbaar meer waarde in productie.
 
-2. Een duidelijke visie op hosting- en platformomgeving
+2. Een duidelijke visie op hosting- en platformomgeving.
 Software levert pas waarde als de onderliggende omgeving klopt. Daarom help ik organisaties om hun hosting- en platformlandschap toekomstvast te maken.
 
 
@@ -12,7 +12,5 @@ Ik ondersteun het management bij het formuleren van een heldere visie en strateg
 Daarnaast help ik bij het maken van duidelijke keuzes over beheer (zoals het borgen en accepteren van implementaties uit projecten) én bij het opstellen van richtlijnen voor observability & monitoring om SLA’s daadwerkelijk te realiseren.
 
 Het resultaat: een platform- en hostingarchitectuur waarmee ontwikkelteams eenvoudig kunnen uitrollen, testen en schalen – en jij als opdrachtgever grip houdt op kwaliteit, kosten en continuïteit.
-
-Top skills: IT-architectuur, Agile (Java)-ontwikkeling, hosting- & platformarchitectuur.
 
 Meer informatie over mijn aanpak vindt u op mijn website.
