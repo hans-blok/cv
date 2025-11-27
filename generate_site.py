@@ -20,7 +20,7 @@ BLOCKS_DIR = CONTENT_DIR / "blocks"
 BLOCKS_CONFIG = CONTENT_DIR / "blocks.txt"
 FUNCTIONAL_DM = ROOT / "specs" / "functional_dm.md"
 CSS_PATH = Path("static") / "style.css"
-OUTPUT_FILE = ROOT / "cv.html"
+OUTPUT_FILE = ROOT / "docs" / "cv.html"
 
 LOGO_CANDIDATES = ["content/pictures/logo-header.png", "content/pictures/logo-header.jpg", "content/pictures/logo.png", "content/pictures/logo.jpg"]
 PROFILE_CANDIDATES = ["content/pictures/profile-photo.jpg", "content/pictures/profile-photo.png", "content/pictures/profile.jpg", "content/pictures/profile.png"]
