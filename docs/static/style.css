@@ -241,6 +241,7 @@ td.value {
   width: 110px;
   height: 110px;
   object-fit: cover;
+  object-position: center top;  /* Align to top to show head, crop from bottom */
   border-radius: 6px;
   flex: 0 0 110px;
   align-self: flex-start;
@@ -423,6 +424,7 @@ td.value {
     width: 96px;
     height: 96px;
     flex: 0 0 96px;
+    object-position: center top;
   }
   
   .container {
@@ -476,6 +478,7 @@ td.value {
     height: 84px;
     align-self: flex-start;
     margin-right: 0;
+    object-position: center top;
   }
   
   .site-logo {
