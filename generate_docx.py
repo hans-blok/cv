@@ -31,6 +31,38 @@ def load_yaml(name):
         return None
     return yaml.safe_load(path.read_text(encoding='utf-8'))
 
+def load_engagements():
+    """All engagement records, newest first - same sort key as main.py's macro."""
+    if not ENGAGEMENTS_DIR.is_dir():
+        return []
+    files = sorted(
+        ENGAGEMENTS_DIR.glob("*.yml"),
+        key=lambda p: yaml.safe_load(p.read_text(encoding='utf-8'))["order"],
+        reverse=True,
+    )
+    return [yaml.safe_load(f.read_text(encoding='utf-8')) for f in files]
+
+def collect_expertise_tags(engagements):
+    """Deduplicated tag list from engagement keywords + certification names -
+    same algorithm as main.py's render_expertise_tags(), so the DOCX shows the
+    same Kernexpertise content as the site/PDF."""
+    seen = set()
+    tags = []
+
+    def add(raw):
+        tag = (raw or "").strip()
+        key = tag.lower()
+        if tag and key not in seen:
+            seen.add(key)
+            tags.append(tag)
+
+    for engagement in engagements:
+        for kw in (engagement.get("keywords") or "").split(","):
+            add(kw)
+    for cert in load_yaml("certifications.yml") or []:
+        add(cert.get("name", ""))
+    return tags
+
 def md_bullets_to_docx_text(text):
     """Normalize migrated content ('- ' Markdown bullets, trailing hard-break
     spaces) into the plain '• '-bulleted, line-broken text add_text_with_breaks()
@@ -79,6 +111,16 @@ def add_section_title(doc, title):
     p.runs[0].font.bold = True
     p.runs[0].font.size = Pt(11)
     p.space_after = Pt(6)
+    return p
+
+def add_detail_label(doc, text):
+    """Small grey/bold sub-label, e.g. 'Werkzaamheden' or 'Opleidingen'."""
+    p = doc.add_paragraph()
+    run = p.add_run(text)
+    run.font.color.rgb = GREY_TEXT
+    run.font.bold = True
+    run.font.size = Pt(10)
+    p.paragraph_format.space_after = Pt(3)
     return p
 
 def add_text_with_breaks(paragraph, text):
@@ -139,6 +181,17 @@ def generate_docx():
 
     add_horizontal_line(doc)
 
+    # Kernexpertise (deduplicated tags - same source/order as the site's Kernexpertise block)
+    engagements = load_engagements()
+    tags = collect_expertise_tags(engagements)
+
+    if tags:
+        add_section_title(doc, 'KERNEXPERTISE')
+        p = doc.add_paragraph()
+        p.add_run(", ".join(tags))
+        p.paragraph_format.space_after = Pt(6)
+        add_horizontal_line(doc)
+
     # Personal Text
     personal_text_file = DATA_DIR / "personal-text.md"
     text = personal_text_file.read_text(encoding='utf-8') if personal_text_file.is_file() else ""
@@ -152,36 +205,36 @@ def generate_docx():
 
     add_horizontal_line(doc)
 
-    # Education
-    add_section_title(doc, 'OPLEIDINGEN')
+    # Achtergrond (Opleidingen + Belangrijkste certificeringen, merged like the site's
+    # collapsed "Achtergrond" block - always shown here since DOCX has no accordion)
+    add_section_title(doc, 'ACHTERGROND')
+
     educations = load_yaml("educations.yml") or []
+    if educations:
+        add_detail_label(doc, "Opleidingen")
+        for row in educations:
+            p = doc.add_paragraph()
+            run = p.add_run(f"{row.get('period', '')}  ")
+            run.font.color.rgb = GREY_TEXT
+            run.font.size = Pt(11)
+            run = p.add_run(row.get("name", ""))
+            if row.get("institute"):
+                run = p.add_run(f" — {row['institute']}")
+            if row.get("place"):
+                run = p.add_run(f", {row['place']}")
+            p.paragraph_format.space_after = Pt(3)
 
-    for row in educations:
-        p = doc.add_paragraph()
-        run = p.add_run(f"{row.get('period', '')}  ")
-        run.font.color.rgb = GREY_TEXT
-        run.font.size = Pt(11)
-        run = p.add_run(row.get("name", ""))
-        if row.get("institute"):
-            run = p.add_run(f" — {row['institute']}")
-        if row.get("place"):
-            run = p.add_run(f", {row['place']}")
-        p.paragraph_format.space_after = Pt(3)
-
-    add_horizontal_line(doc)
-
-    # Certifications
-    add_section_title(doc, 'CERTIFICERINGEN')
     certifications = load_yaml("certifications.yml") or []
-
-    for row in certifications:
-        p = doc.add_paragraph()
-        run = p.add_run(f"{row.get('period', '')}  ")
-        run.font.color.rgb = GREY_TEXT
-        run = p.add_run(row.get("name", ""))
-        if row.get("institute"):
-            run = p.add_run(f" — {row['institute']}")
-        p.paragraph_format.space_after = Pt(3)
+    if certifications:
+        add_detail_label(doc, "Belangrijkste certificeringen")
+        for row in certifications:
+            p = doc.add_paragraph()
+            run = p.add_run(f"{row.get('period', '')}  ")
+            run.font.color.rgb = GREY_TEXT
+            run = p.add_run(row.get("name", ""))
+            if row.get("institute"):
+                run = p.add_run(f" — {row['institute']}")
+            p.paragraph_format.space_after = Pt(3)
 
     add_horizontal_line(doc)
 
@@ -198,19 +251,24 @@ def generate_docx():
 
     add_horizontal_line(doc)
 
+    # Overige cursussen
+    courses_short = load_yaml("courses-short.yml") or []
+    if courses_short:
+        add_section_title(doc, 'OVERIGE CURSUSSEN')
+        for group in courses_short:
+            p = doc.add_paragraph()
+            if group.get('period'):
+                run = p.add_run(f"{group['period']}  ")
+                run.font.color.rgb = GREY_TEXT
+            run = p.add_run(group.get("items_text", ""))
+            p.paragraph_format.space_after = Pt(3)
+        add_horizontal_line(doc)
+
     # Werkervaring (Engagements)
     add_section_title(doc, 'WERKERVARING')
 
-    if ENGAGEMENTS_DIR.is_dir():
-        engagement_files = sorted(
-            ENGAGEMENTS_DIR.glob("*.yml"),
-            key=lambda p: yaml.safe_load(p.read_text(encoding='utf-8'))["order"],
-            reverse=True,
-        )
-
-        for eng_file in engagement_files:
-            eng = yaml.safe_load(eng_file.read_text(encoding='utf-8'))
-
+    if engagements:
+        for eng in engagements:
             # Summary line
             p = doc.add_paragraph()
             if eng.get("period"):
@@ -224,37 +282,19 @@ def generate_docx():
 
             # Details
             if eng.get("activities"):
-                p = doc.add_paragraph()
-                run = p.add_run("Werkzaamheden")
-                run.font.color.rgb = GREY_TEXT
-                run.font.bold = True
-                run.font.size = Pt(10)
-                p.paragraph_format.space_after = Pt(3)
-
+                add_detail_label(doc, "Werkzaamheden")
                 p = doc.add_paragraph()
                 add_text_with_breaks(p, md_bullets_to_docx_text(eng["activities"]))
                 p.paragraph_format.space_after = Pt(6)
 
             if eng.get("achievements"):
-                p = doc.add_paragraph()
-                run = p.add_run("Belangrijkste prestaties")
-                run.font.color.rgb = GREY_TEXT
-                run.font.bold = True
-                run.font.size = Pt(10)
-                p.paragraph_format.space_after = Pt(3)
-
+                add_detail_label(doc, "Belangrijkste prestaties")
                 p = doc.add_paragraph()
                 add_text_with_breaks(p, md_bullets_to_docx_text(eng["achievements"]))
                 p.paragraph_format.space_after = Pt(6)
 
             if eng.get("keywords"):
-                p = doc.add_paragraph()
-                run = p.add_run("Trefwoorden")
-                run.font.color.rgb = GREY_TEXT
-                run.font.bold = True
-                run.font.size = Pt(10)
-                p.paragraph_format.space_after = Pt(3)
-
+                add_detail_label(doc, "Trefwoorden")
                 p = doc.add_paragraph()
                 add_text_with_breaks(p, eng["keywords"])
                 p.paragraph_format.space_after = Pt(6)
