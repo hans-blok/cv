@@ -118,4 +118,5 @@ def on_env(env, config, files):
     today = datetime.now(timezone.utc).date()
     env.globals["publicatiedatum_nl"] = format_date(today, format="d MMMM y", locale="nl_NL")
     env.globals["publicatiedatum_iso"] = today.isoformat()
+    env.globals["publicatiedatum_spaced"] = today.strftime("%Y %m %d")
     return env
