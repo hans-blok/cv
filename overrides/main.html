@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CV</title>
+{% for css in config.extra_css %}
+<link rel="stylesheet" href="{{ css|url }}">
+{% endfor %}
+</head>
+<body>
+{{ page.content }}
+<div class='generated'>{{ build_date_utc.strftime('%d %B %Y %H:%M:%S') }}</div>
+{% for js in config.extra_javascript %}
+<script src="{{ js|url }}"></script>
+{% endfor %}
+</body>
+</html>

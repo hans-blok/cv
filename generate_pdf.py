@@ -12,8 +12,9 @@ import re
 # Paths
 BASE_DIR = Path(__file__).parent
 DOCS_DIR = BASE_DIR / "docs"
-HTML_FILE = DOCS_DIR / "cv.html"
-OUTPUT_PDF = DOCS_DIR / "cv.pdf"
+SITE_DIR = BASE_DIR / "site"
+HTML_FILE = SITE_DIR / "cv.html"
+OUTPUT_PDF = DOCS_DIR / "assets" / "cv.pdf"
 
 def find_chrome():
     """Find Chrome or Edge browser executable"""
@@ -44,11 +45,11 @@ def generate_pdf():
     """Generate PDF from HTML file using headless browser"""
     
     if not HTML_FILE.exists():
-        print(f"Error: {HTML_FILE} not found. Run generate_site.py first.")
+        print(f"Error: {HTML_FILE} not found. Run 'mkdocs build' first.")
         return False
-    
-    # Ensure docs directory exists
-    DOCS_DIR.mkdir(exist_ok=True)
+
+    # Ensure output directory exists
+    OUTPUT_PDF.parent.mkdir(parents=True, exist_ok=True)
     
     browser_path = find_chrome()
     if not browser_path:
@@ -65,8 +66,10 @@ def generate_pdf():
     print(f"Reading HTML from: {HTML_FILE}")
     print(f"Generating PDF: {OUTPUT_PDF}")
     
-    # Create a temporary HTML with expanded engagements for PDF
-    temp_html = BASE_DIR / "cv_temp.html"
+    # Create a temporary HTML with expanded engagements for PDF.
+    # Written into SITE_DIR (not BASE_DIR) so relative asset paths (assets/img/..., stylesheets/...)
+    # still resolve correctly when Chrome loads it from disk.
+    temp_html = SITE_DIR / "cv_temp.html"
     html_content = HTML_FILE.read_text(encoding='utf-8')
     
     # Remove title to prevent it showing in PDF header
@@ -83,11 +86,11 @@ def generate_pdf():
         print("⚠ Warning: Could not find sidebar")
     
     # Read the CSS file and inline it for PDF
-    css_file = DOCS_DIR / "static" / "style.css"
+    css_file = SITE_DIR / "stylesheets" / "style.css"
     css_content = css_file.read_text(encoding='utf-8') if css_file.exists() else ""
-    
+
     # Find and replace any CSS link tag with inline CSS
-    css_link_pattern = r"<link rel='stylesheet' href='[^']*style\.css[^']*'>"
+    css_link_pattern = r"<link rel=[\"']stylesheet[\"'] href=[\"'][^\"']*style\.css[^\"']*[\"']>"
     html_content = re.sub(css_link_pattern, f"<style>{css_content}</style>", html_content)
     
     # Add print-specific CSS and JavaScript for expanding engagements
@@ -170,7 +173,7 @@ def generate_pdf():
     </head>''')
     
     # Debug: Save a copy to see what we're generating
-    debug_file = BASE_DIR / "cv_debug.html"
+    debug_file = SITE_DIR / "cv_debug.html"
     debug_file.write_text(html_content, encoding='utf-8')
     print(f"✓ Debug HTML saved to: {debug_file}")
     

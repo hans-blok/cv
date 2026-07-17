@@ -24,7 +24,7 @@ COURSES_SHORT_FILE = CONTENT_DIR / "courses-short.txt"
 CERTIFICATIONS_FILE = CONTENT_DIR / "certifications.txt"
 BLOCKS_CONFIG = CONTENT_DIR / "blocks.txt"
 PROFILE_PHOTO = ROOT / "content" / "pictures" / "profile-photo.jpg"
-OUTPUT_FILE = ROOT / "docs" / "cv.docx"
+OUTPUT_FILE = ROOT / "docs" / "assets" / "cv.docx"
 
 # Colors
 GREY_TEXT = RGBColor(99, 110, 114)  # #636e72

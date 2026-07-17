@@ -1,0 +1,1 @@
+<table class='education-table'><tr><td class='label'>2025</td><td>ArchiMate® 3 — The Open Group</td><td class='edu-place'></td></tr><tr><td class='label'>2022</td><td>SAFe@ 5 Architect — Scaled Agile Inc</td><td class='edu-place'></td></tr><tr><td class='label'>2019</td><td>SOA Professional Gen 1 (mod 1,3, 8) (Honors) — Arcitura</td><td class='edu-place'></td></tr></table>
