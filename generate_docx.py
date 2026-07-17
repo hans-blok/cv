@@ -9,21 +9,17 @@ from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
-import re
+from bs4 import BeautifulSoup
 
-# Paths
+# Paths - source is the MkDocs Markdown/HTML fragments, not the retired content/*.txt DSL
 ROOT = Path(__file__).resolve().parent
-CONTENT_DIR = ROOT / "content"
-ENGAGEMENTS_DIR = CONTENT_DIR / "engagements"
-PERSONAL_DATA_FILE = CONTENT_DIR / "personal-data.txt"
-PERSONAL_TEXT_FILE = CONTENT_DIR / "personal-text.txt"
-URLS_FILE = CONTENT_DIR / "urls-contact.txt"
-EDUCATION_FILE = CONTENT_DIR / "educations.txt"
-COURSES_FILE = CONTENT_DIR / "courses.txt"
-COURSES_SHORT_FILE = CONTENT_DIR / "courses-short.txt"
-CERTIFICATIONS_FILE = CONTENT_DIR / "certifications.txt"
-BLOCKS_CONFIG = CONTENT_DIR / "blocks.txt"
-PROFILE_PHOTO = ROOT / "content" / "pictures" / "profile-photo.jpg"
+INCLUDES_DIR = ROOT / "docs" / "includes"
+ENGAGEMENTS_DIR = INCLUDES_DIR / "engagements"
+PERSONAL_DATA_FILE = INCLUDES_DIR / "personal-data.md"
+PERSONAL_TEXT_FILE = INCLUDES_DIR / "personal-text.md"
+EDUCATION_FILE = INCLUDES_DIR / "educations.md"
+COURSES_FILE = INCLUDES_DIR / "courses.md"
+CERTIFICATIONS_FILE = INCLUDES_DIR / "certifications.md"
 OUTPUT_FILE = ROOT / "docs" / "assets" / "cv.docx"
 
 # Colors
@@ -56,56 +52,117 @@ def set_cell_border(cell, **kwargs):
             tcBorders.append(border)
     tcPr.append(tcBorders)
 
-def parse_file_with_delimiter(path: Path, skip_header=True):
-    """Parse pipe-delimited file"""
+def tekstblok_text(tag):
+    """Convert a <div class='tekstblok'> fragment back to plain text: bullets
+    become '• ' lines, <br> becomes a line break, paragraphs are separated by
+    a blank line - the inverse of generate_site.py's format_value_for_html().
+    """
+    if tag is None:
+        return ""
+    for br in tag.find_all('br'):
+        br.replace_with('\n')
+    children = tag.find_all(['p', 'ul'], recursive=False)
+    if not children:
+        # No <p>/<ul> wrapping (e.g. courses.md is plain linkified text) - use the raw text.
+        return tag.get_text().strip()
+    blocks = []
+    for child in children:
+        if child.name == 'ul':
+            items = ['• ' + li.get_text().strip() for li in child.find_all('li', recursive=False)]
+            blocks.append('\n'.join(items))
+        else:
+            blocks.append(child.get_text().strip())
+    return '\n\n'.join(b for b in blocks if b)
+
+def parse_personal_data(path: Path):
+    """Parse docs/includes/personal-data.md (a <table class='personal-table'> fragment)"""
     if not path.is_file():
         return []
-    lines = []
-    for line in path.read_text(encoding='utf-8').splitlines():
-        if not line.strip():
+    soup = BeautifulSoup(path.read_text(encoding='utf-8'), 'html.parser')
+    rows = []
+    for tr in soup.select('table.personal-table tr'):
+        label_td = tr.find('td', class_='label')
+        value_td = tr.find('td', class_='value')
+        if not label_td or not value_td:
             continue
-        if skip_header and '`' in line and '|' in line:
-            continue
-        if '|' in line:
-            parts = [p.strip() for p in line.split('|')]
-            lines.append(parts)
-    return lines
+        label = label_td.get_text(strip=True)
+        value = tekstblok_text(value_td.find('div', class_='tekstblok'))
+        rows.append([label, value])
+    return rows
 
-def parse_engagement_file(path: Path):
-    """Parse engagement text file"""
-    txt = path.read_text(encoding='utf-8')
-    lines = [l.rstrip() for l in txt.splitlines()]
-    data = {}
-    cur = None
-    buf = []
-    
-    for ln in lines:
-        s = ln.strip()
-        if not s:
+def parse_personal_text(path: Path):
+    """Parse docs/includes/personal-text.md (a <div class='tekstblok'> fragment)"""
+    if not path.is_file():
+        return ""
+    soup = BeautifulSoup(path.read_text(encoding='utf-8'), 'html.parser')
+    return tekstblok_text(soup.find('div', class_='tekstblok'))
+
+def parse_education_table(path: Path):
+    """Parse docs/includes/educations.md or certifications.md (a <table class='education-table'>
+    fragment). Name/institute are already merged with an em dash by the conversion step, so this
+    returns [period, name(+institute), "", place] - the empty institute slot keeps the existing
+    render loop below unchanged.
+    """
+    if not path.is_file():
+        return []
+    soup = BeautifulSoup(path.read_text(encoding='utf-8'), 'html.parser')
+    rows = []
+    for tr in soup.select('table.education-table tr'):
+        label_td = tr.find('td', class_='label')
+        if not label_td:
             continue
-            
-        if '|' in s:
-            parts = s.split('|', 1)
-            key = parts[0].strip().strip('`').strip("'").strip()
-            value = parts[1].strip() if len(parts) > 1 else ""
-            
-            if cur:
-                data[cur] = '\n'.join(buf).strip()
-            
-            cur = key
-            buf = [value] if value else []
-        elif s.startswith('•') or (cur and '|' not in s):
-            if cur:
-                buf.append(ln)
-    
-    if cur:
-        data[cur] = '\n'.join(buf).strip()
-    
-    period = path.name.replace("opdracht_", "").replace(".txt", "").replace("_", " – ")
-    if "period" not in data and "periode" not in data and "PERIODE" not in data:
-        data["periode"] = period
-    
-    return data
+        period = label_td.get_text(strip=True)
+        if not period:
+            continue  # description continuation row, not used by the DOCX output
+        tds = tr.find_all('td')
+        name_td = tds[1] if len(tds) > 1 else None
+        place_td = tr.find('td', class_='edu-place')
+        name = name_td.get_text(strip=True) if name_td else ""
+        place = place_td.get_text(strip=True) if place_td else ""
+        rows.append([period, name, "", place])
+    return rows
+
+def parse_courses(path: Path):
+    """Parse docs/includes/courses.md (one <table class='education-table'> per period,
+    already pre-grouped by the conversion step)."""
+    if not path.is_file():
+        return []
+    soup = BeautifulSoup(path.read_text(encoding='utf-8'), 'html.parser')
+    result = []
+    for table in soup.find_all('table', class_='education-table'):
+        tr = table.find('tr')
+        if not tr:
+            continue
+        label_td = tr.find('td', class_='label')
+        period = label_td.get_text(strip=True) if label_td else ""
+        tds = tr.find_all('td')
+        value_td = tds[-1] if tds else None
+        items_text = tekstblok_text(value_td.find('div', class_='tekstblok')) if value_td else ""
+        result.append((period, items_text))
+    return result
+
+def parse_engagement_md(path: Path):
+    """Parse a docs/includes/engagements/opdracht_*.md fragment (an .engagement-item div)"""
+    soup = BeautifulSoup(path.read_text(encoding='utf-8'), 'html.parser')
+    periode_span = soup.find('span', class_='engagement-period')
+    org_span = soup.find('span', class_='engagement-org')
+    role_span = soup.find('span', class_='engagement-role')
+    periode = periode_span.get_text(strip=True) if periode_span else ""
+    organisatie = org_span.get_text(strip=True) if org_span else ""
+    functie = role_span.get_text(strip=True) if role_span else ""
+
+    werkzaamheden = prestaties = trefwoorden = ""
+    for item in soup.find_all('div', class_='engagement-detail-item'):
+        label_div = item.find('div', class_='detail-label')
+        label_text = label_div.get_text(strip=True) if label_div else ""
+        value = tekstblok_text(item.find('div', class_='tekstblok'))
+        if label_text == 'Werkzaamheden':
+            werkzaamheden = value
+        elif label_text == 'Belangrijkste prestaties':
+            prestaties = value
+        elif label_text == 'Trefwoorden':
+            trefwoorden = value
+    return periode, organisatie, functie, werkzaamheden, prestaties, trefwoorden
 
 def add_section_title(doc, title):
     """Add section title (grey, uppercase, bold)"""
@@ -144,7 +201,7 @@ def generate_docx():
         section.right_margin = Inches(0.5)
     
     # Personal Data
-    personal_data = parse_file_with_delimiter(PERSONAL_DATA_FILE)
+    personal_data = parse_personal_data(PERSONAL_DATA_FILE)
     
     add_section_title(doc, 'PERSOONLIJKE GEGEVENS')
     
@@ -179,10 +236,10 @@ def generate_docx():
     add_horizontal_line(doc)
     
     # Personal Text
-    if PERSONAL_TEXT_FILE.is_file():
-        text = PERSONAL_TEXT_FILE.read_text(encoding='utf-8')
+    text = parse_personal_text(PERSONAL_TEXT_FILE)
+    if text:
         paragraphs = text.split('\n\n')
-        
+
         for para in paragraphs:
             if para.strip():
                 p = doc.add_paragraph()
@@ -193,7 +250,7 @@ def generate_docx():
     
     # Education
     add_section_title(doc, 'OPLEIDINGEN')
-    educations = parse_file_with_delimiter(EDUCATION_FILE)
+    educations = parse_education_table(EDUCATION_FILE)
     
     for parts in educations:
         period = parts[0] if len(parts) > 0 else ""
@@ -218,7 +275,7 @@ def generate_docx():
     
     # Certifications
     add_section_title(doc, 'CERTIFICERINGEN')
-    certifications = parse_file_with_delimiter(CERTIFICATIONS_FILE)
+    certifications = parse_education_table(CERTIFICATIONS_FILE)
     
     for parts in certifications:
         period = parts[0] if len(parts) > 0 else ""
@@ -237,22 +294,13 @@ def generate_docx():
     
     # Courses
     add_section_title(doc, 'CURSUSSEN')
-    courses = parse_file_with_delimiter(COURSES_FILE)
-    
-    # Group by period
-    periods = {}
-    for parts in courses:
-        period = parts[0] if len(parts) > 0 else ""
-        items = parts[1:] if len(parts) > 1 else []
-        if period not in periods:
-            periods[period] = []
-        periods[period].extend(items)
-    
-    for period, items in periods.items():
+    courses = parse_courses(COURSES_FILE)
+
+    for period, items_text in courses:
         p = doc.add_paragraph()
         run = p.add_run(f"{period}  ")
         run.font.color.rgb = GREY_TEXT
-        run = p.add_run(", ".join(items))
+        run = p.add_run(items_text)
         p.paragraph_format.space_after = Pt(3)
     
     add_horizontal_line(doc)
@@ -262,28 +310,13 @@ def generate_docx():
     
     if ENGAGEMENTS_DIR.is_dir():
         engagement_files = sorted(ENGAGEMENTS_DIR.iterdir(), key=lambda p: p.name, reverse=True)
-        
+
         for eng_file in engagement_files:
-            if not eng_file.is_file() or eng_file.suffix.lower() != ".txt":
+            if not eng_file.is_file() or eng_file.suffix.lower() != ".md":
                 continue
-            
-            data = parse_engagement_file(eng_file)
-            
-            # Get data with case-insensitive lookup
-            def get_field(variants):
-                for v in variants:
-                    for key, value in data.items():
-                        if key.lower() == v.lower():
-                            return value
-                return ""
-            
-            periode = get_field(["periode", "PERIODE", "period"])
-            organisatie = get_field(["organisatie", "ORGANISATIE", "organisatie_naam", "organization", "organization_name"])
-            functie = get_field(["functie", "FUNCTIE", "job", "job_title"])
-            werkzaamheden = get_field(["werkzaamheden", "WERKZAAMHEDEN", "work", "text_block_work"])
-            prestaties = get_field(["belangrijkste prestaties", "BELANGRIJKSTE PRESTATIES", "prestaties", "achievements"])
-            trefwoorden = get_field(["trefwoorden", "TREFWOORDEN", "keywords"])
-            
+
+            periode, organisatie, functie, werkzaamheden, prestaties, trefwoorden = parse_engagement_md(eng_file)
+
             # Summary line
             p = doc.add_paragraph()
             if periode:

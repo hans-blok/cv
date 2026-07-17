@@ -1,4 +1,0 @@
-`year`|`name`|`organization`
-2025|ArchiMate® 3|The Open Group
-2022|SAFe@ 5 Architect|Scaled Agile Inc
-2019|SOA Professional Gen 1 (mod 1,3, 8) (Honors)|Arcitura
