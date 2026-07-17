@@ -50,7 +50,17 @@ def generate_pdf():
 
     # Ensure output directory exists
     OUTPUT_PDF.parent.mkdir(parents=True, exist_ok=True)
-    
+
+    # Check whether the output file is locked by another process (e.g. Adobe Acrobat)
+    if OUTPUT_PDF.exists():
+        try:
+            with OUTPUT_PDF.open('r+b'):
+                pass
+        except PermissionError:
+            print(f"Error: {OUTPUT_PDF} is locked by another application (e.g. Adobe Acrobat).")
+            print("Sluit de PDF-viewer en probeer opnieuw.")
+            return False
+
     browser_path = find_chrome()
     if not browser_path:
         print("Error: Chrome or Edge browser not found.")

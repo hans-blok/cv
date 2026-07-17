@@ -225,6 +225,15 @@ td.value {
   font-weight: 400;            /* RULE 14: content not bold */
 }
 
+/* Profile headline (recruiter-facing role/specialization subtitle) */
+.profile-headline {
+  font-size: 1.15em;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
 /* Personal block */
 .personal-block {
   display: flex;
@@ -339,6 +348,14 @@ td.value {
   margin-left: auto;
   text-align: right;
   flex-shrink: 0;
+}
+
+.engagement-teaser {
+  color: var(--text-muted);
+  font-size: 0.85em;
+  padding-left: 128px;
+  margin-top: -4px;
+  margin-bottom: 6px;
 }
 
 .engagement-details {
@@ -525,6 +542,10 @@ td.value {
     margin-left: 0 !important;
     padding-left: 0;
     text-align: left !important;
+  }
+
+  .engagement-teaser {
+    padding-left: 24px;
   }
   
   /* Education: place on new line, description stays under name */

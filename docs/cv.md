@@ -6,6 +6,11 @@ title: CV
 </section>
 <div class='block-sep'></div>
 
+<section class='block'><div class='block-title'>WERKERVARING</div>
+{{ render_engagements() }}
+</section>
+<div class='block-sep'></div>
+
 <section class='block'><div class='block-title'>PERSOONLIJK</div>
 {{ render_personal_text() }}
 </section>
@@ -28,9 +33,4 @@ title: CV
 
 <section class='block'><div class='block-title'>OVERIGE CURSUSSEN</div>
 {{ render_courses('courses-short') }}
-</section>
-<div class='block-sep'></div>
-
-<section class='block'><div class='block-title'>WERKERVARING</div>
-{{ render_engagements() }}
 </section>
