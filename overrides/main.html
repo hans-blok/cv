@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CV</title>
 {% for css in config.extra_css %}
-<link rel="stylesheet" href="{{ css|url }}">
+<link rel="stylesheet" href="{{ css|url }}?v={{ build_date_utc.strftime('%Y%m%d%H%M%S') }}">
 {% endfor %}
 </head>
 <body>
@@ -21,7 +21,7 @@
 </div>
 <div class='generated'>{{ build_date_utc.strftime('%d %B %Y %H:%M:%S') }}</div>
 {% for js in config.extra_javascript %}
-<script src="{{ js|url }}"></script>
+<script src="{{ js|url }}?v={{ build_date_utc.strftime('%Y%m%d%H%M%S') }}"></script>
 {% endfor %}
 </body>
 </html>
