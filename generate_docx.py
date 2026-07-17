@@ -36,6 +36,12 @@ CONTACT_ICONS = {
     "email": "✉",
 }
 
+# Real icon image, used instead of the CONTACT_ICONS emoji fallback where available
+# (pre-rendered once from the same SVG the site uses, docs/stylesheets/style.css).
+CONTACT_ICON_IMAGES = {
+    "github": ROOT / "docs" / "assets" / "img" / "icons" / "github.png",
+}
+
 def load_yaml(name):
     path = DATA_DIR / name
     if not path.is_file():
@@ -257,8 +263,14 @@ def generate_docx():
         for i, item in enumerate(contacts):
             p = contact_cell.paragraphs[0] if i == 0 else contact_cell.add_paragraph()
             p.paragraph_format.space_after = Pt(2)
-            icon = p.add_run(CONTACT_ICONS.get(item.get("type"), "") + " ")
-            icon.font.size = Pt(9.5)
+            icon_type = item.get("type")
+            icon_image = CONTACT_ICON_IMAGES.get(icon_type)
+            if icon_image and icon_image.is_file():
+                p.add_run().add_picture(str(icon_image), width=Pt(11))
+                p.add_run(" ")
+            else:
+                icon = p.add_run(CONTACT_ICONS.get(icon_type, "") + " ")
+                icon.font.size = Pt(9.5)
             add_hyperlink(p, item.get("url", ""), item.get("label", ""), size_pt=9.5)
 
         if has_photo:
