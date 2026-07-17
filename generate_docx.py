@@ -14,6 +14,7 @@ from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
+from docx.opc.constants import RELATIONSHIP_TYPE as RT
 
 # Paths
 ROOT = Path(__file__).resolve().parent
@@ -22,10 +23,18 @@ ENGAGEMENTS_DIR = DATA_DIR / "engagements"
 OUTPUT_FILE = ROOT / "docs" / "assets" / "cv.docx"
 
 # Colors (matching docs/stylesheets/style.css)
+TEXT_PRIMARY = RGBColor(0x11, 0x11, 0x11)  # #111 - var(--text-primary)
 GREY_TEXT = RGBColor(99, 110, 114)   # #636e72 - var(--text-muted)
 GREY_LIGHT = RGBColor(178, 190, 195)  # #b2bec3 - var(--sep-block)
-ACCENT_BLUE = RGBColor(0x0A, 0x66, 0xC2)  # #0A66C2 - same blue as the site's "Download PDF" button
 TAG_BG = "DFE6E9"  # #dfe6e9 - var(--sep-course), same background as the site's expertise-tag chips
+
+CONTACT_ICONS = {
+    "linkedin": "🔗",
+    "website": "🌐",
+    "github": "💻",
+    "phone": "☎",
+    "email": "✉",
+}
 
 def load_yaml(name):
     path = DATA_DIR / name
@@ -115,14 +124,40 @@ def set_cell_shading(cell, hex_color):
     tcPr.append(shd)
 
 def add_section_title(doc, title):
-    """Add section title (accent blue, uppercase, bold) - same accent color
-    as the site's "Download PDF" button, for a touch of brand color."""
+    """Add section title (dark, uppercase, bold)"""
     p = doc.add_paragraph()
-    p.add_run(title.upper()).font.color.rgb = ACCENT_BLUE
+    p.add_run(title.upper()).font.color.rgb = TEXT_PRIMARY
     p.runs[0].font.bold = True
     p.runs[0].font.size = Pt(11)
     p.space_after = Pt(6)
     return p
+
+def add_hyperlink(paragraph, url, text, color="1155CC", size_pt=None):
+    """Add a clickable hyperlink run to a paragraph (python-docx has no
+    built-in API for this - standard low-level OOXML recipe)."""
+    part = paragraph.part
+    r_id = part.relate_to(url, RT.HYPERLINK, is_external=True)
+
+    hyperlink = OxmlElement('w:hyperlink')
+    hyperlink.set(qn('r:id'), r_id)
+
+    run = OxmlElement('w:r')
+    rPr = OxmlElement('w:rPr')
+    if color:
+        c = OxmlElement('w:color')
+        c.set(qn('w:val'), color)
+        rPr.append(c)
+    if size_pt:
+        sz = OxmlElement('w:sz')
+        sz.set(qn('w:val'), str(int(size_pt * 2)))  # half-points
+        rPr.append(sz)
+    run.append(rPr)
+    t = OxmlElement('w:t')
+    t.text = text
+    run.append(t)
+    hyperlink.append(run)
+    paragraph._p.append(hyperlink)
+    return hyperlink
 
 def add_tag_grid(doc, tags, columns=4):
     """Render tags as a borderless, shaded-cell grid - approximates the site's
@@ -210,21 +245,21 @@ def generate_docx():
         p.add_run().add_picture(str(photo_path), width=Inches(1.2))
         p.paragraph_format.space_after = Pt(6)
 
-    # Compact contact line (site's sidebar has no direct DOCX equivalent, but
-    # a recruiter reading a downloaded Word file still needs a way to reach out)
+    # Compact contact line: icon + short label only (never the raw URL),
+    # clickable via a real hyperlink - site's sidebar has no direct DOCX
+    # equivalent, but a recruiter reading a downloaded Word file still needs
+    # a way to reach out.
     contacts = load_yaml("contact.yml") or []
     if contacts:
         p = doc.add_paragraph()
-        parts = []
-        for item in contacts:
-            if item.get("type") in ("phone", "email"):
-                parts.append(item.get("title", ""))
-            else:
-                parts.append(f"{item.get('label', '')}: {item.get('title', '')}")
-        run = p.add_run(" · ".join(parts))
-        run.font.color.rgb = GREY_TEXT
-        run.font.size = Pt(9.5)
         p.paragraph_format.space_after = Pt(8)
+        for i, item in enumerate(contacts):
+            if i > 0:
+                sep = p.add_run("     ")
+                sep.font.size = Pt(9.5)
+            icon = p.add_run(CONTACT_ICONS.get(item.get("type"), "") + " ")
+            icon.font.size = Pt(9.5)
+            add_hyperlink(p, item.get("url", ""), item.get("label", ""), size_pt=9.5)
 
     if fields:
         table = doc.add_table(rows=len(fields), cols=2)
