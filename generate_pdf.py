@@ -136,24 +136,65 @@ def generate_pdf():
             display: none !important;
         }
         
+        /* Body and html: remove browser default margins */
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
         /* Container: keep flex layout, remove auto-centering and max-width */
         .container {
             display: flex !important;
             margin: 0 !important;
-            padding: 12px !important;
+            padding: 0 !important;
             max-width: none !important;
             align-items: flex-start !important;
+            gap: 0 !important;
         }
-        
-        /* Sidebar: remove sticky positioning (doesn't work in print) */
+
+        /* Sidebar: remove sticky positioning, add right border as separator */
         .urls-sidebar {
             position: static !important;
             top: auto !important;
-            align-self: flex-start !important;
-            width: 180px !important;
+            align-self: stretch !important;
+            width: 160px !important;
+            min-width: 160px !important;
             flex-shrink: 0 !important;
+            padding: 0 16px 0 0 !important;
+            margin-right: 16px !important;
+            border-right: 1px solid #d0d0d0 !important;
+            gap: 6px !important;
         }
-        
+
+        /* Sidebar logo */
+        .sidebar-logo {
+            margin-bottom: 16px !important;
+        }
+
+        .sidebar-logo-img {
+            max-width: 140px !important;
+            max-height: 90px !important;
+        }
+
+        /* Sidebar contact links: smaller font for print */
+        .contact-link {
+            font-size: 0.78em !important;
+            padding: 3px 0 !important;
+            gap: 5px !important;
+        }
+
+        .contact-link::before {
+            width: 16px !important;
+            height: 16px !important;
+        }
+
+        /* Main content: proper left spacing */
+        .main-content {
+            flex: 1 !important;
+            min-width: 0 !important;
+            padding-left: 0 !important;
+        }
+
         /* Hide download button in PDF */
         .pdf-download-btn {
             display: none !important;
