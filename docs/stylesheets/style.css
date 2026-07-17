@@ -177,6 +177,9 @@ body {
   text-transform: uppercase;
   color: var(--text-muted);
   margin: 0 0 6px 0;
+  font-size: inherit;   /* neutralize default <h2> sizing - visual style unaffected by tag */
+  font-family: inherit;
+  line-height: inherit;
 }
 
 /* RULE 15 & RULE 17: Block separator lines with symmetric spacing */
@@ -232,6 +235,23 @@ td.value {
   margin-bottom: 10px;
   max-width: 100%;
   overflow-wrap: break-word;
+}
+
+/* Expertise tags (deduplicated keywords + certifications, always-visible scan block) */
+.expertise-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+}
+
+.expertise-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--sep-course);
+  color: var(--text-primary);
+  font-size: 0.85em;
+  font-weight: 400;
 }
 
 /* Personal block */
