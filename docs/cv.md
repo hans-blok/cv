@@ -40,6 +40,7 @@ title: CV
 <div class='block-sep'></div>
 
 <section class='block'><div class='block-title'>WERKERVARING</div>
+{% include-markdown "includes/engagements/opdracht_2026_heden.md" %}
 {% include-markdown "includes/engagements/opdracht_2025_heden.md" %}
 {% include-markdown "includes/engagements/opdracht_2021_2024.md" %}
 {% include-markdown "includes/engagements/opdracht_2020_2021.md" %}
