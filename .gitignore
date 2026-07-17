@@ -1,0 +1,6 @@
+.venv/
+site/
+cv_debug.html
+cv_temp.html
+__pycache__/
+*.pyc

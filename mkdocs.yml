@@ -1,0 +1,40 @@
+site_name: Hans Blok — CV
+site_url: https://hans-blok.github.io/cv/
+site_description: Curriculum Vitae van Johannes (Hans) Blok, IT-Architect
+
+docs_dir: docs
+site_dir: site
+
+use_directory_urls: false
+
+theme:
+  name: null
+  custom_dir: overrides
+
+nav:
+  - CV: cv.md
+
+exclude_docs: |
+  data/
+
+extra_css:
+  - stylesheets/style.css
+
+extra_javascript:
+  - javascripts/cv.js
+
+markdown_extensions:
+  - attr_list
+  - tables
+  - md_in_html
+  - def_list
+
+plugins:
+  - macros:
+      module_name: main
+
+hooks:
+  - main.py
+
+extra:
+  generator: false

@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Genereer PDF en DOCX",
+            "type": "shell",
+            "command": "${workspaceFolder}\\build.ps1",
+            "options": {
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"]
+                }
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "detail": "Bouwt de site vanuit docs/includes/*.md en genereert cv.pdf en cv.docx in docs/assets/."
+        }
+    ]
+}

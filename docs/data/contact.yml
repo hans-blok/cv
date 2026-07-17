@@ -1,0 +1,20 @@
+- type: linkedin
+  label: LinkedIn
+  url: https://www.linkedin.com/in/hans-blok/
+  title: https://www.linkedin.com/in/hans-blok/
+- type: website
+  label: Website
+  url: https://www.2-minuten-it-architectuur.nl/
+  title: https://www.2-minuten-it-architectuur.nl/
+- type: github
+  label: GitHub
+  url: https://github.com/hans-blok
+  title: https://github.com/hans-blok
+- type: phone
+  label: 06 3045 1822
+  url: tel:06 3045 1822
+  title: 06 3045 1822
+- type: email
+  label: hans.blok@the-future-group.com
+  url: mailto:hans.blok@the-future-group.com
+  title: hans.blok@the-future-group.com

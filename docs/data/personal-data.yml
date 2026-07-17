@@ -1,0 +1,14 @@
+photo: assets/img/profile-photo.jpg
+fields:
+- label: Naam
+  value: Johannes Blok
+- label: Roepnaam
+  value: Hans
+- label: Woonplaats
+  value: Wijk bij Duurstede
+- label: Geboortedatum
+  value: 3 januari 1971
+- label: Functie
+  value: IT-Architect
+- label: Beschikbaar per
+  value: 1 september 2026
