@@ -21,9 +21,11 @@ DATA_DIR = ROOT / "docs" / "data"
 ENGAGEMENTS_DIR = DATA_DIR / "engagements"
 OUTPUT_FILE = ROOT / "docs" / "assets" / "cv.docx"
 
-# Colors
-GREY_TEXT = RGBColor(99, 110, 114)  # #636e72
-GREY_LIGHT = RGBColor(178, 190, 195)  # #b2bec3
+# Colors (matching docs/stylesheets/style.css)
+GREY_TEXT = RGBColor(99, 110, 114)   # #636e72 - var(--text-muted)
+GREY_LIGHT = RGBColor(178, 190, 195)  # #b2bec3 - var(--sep-block)
+ACCENT_BLUE = RGBColor(0x0A, 0x66, 0xC2)  # #0A66C2 - same blue as the site's "Download PDF" button
+TAG_BG = "DFE6E9"  # #dfe6e9 - var(--sep-course), same background as the site's expertise-tag chips
 
 def load_yaml(name):
     path = DATA_DIR / name
@@ -104,14 +106,46 @@ def set_cell_border(cell, **kwargs):
             tcBorders.append(border)
     tcPr.append(tcBorders)
 
+def set_cell_shading(cell, hex_color):
+    """Fill a table cell with a solid background color"""
+    tcPr = cell._tc.get_or_add_tcPr()
+    shd = OxmlElement('w:shd')
+    shd.set(qn('w:val'), 'clear')
+    shd.set(qn('w:fill'), hex_color)
+    tcPr.append(shd)
+
 def add_section_title(doc, title):
-    """Add section title (grey, uppercase, bold)"""
+    """Add section title (accent blue, uppercase, bold) - same accent color
+    as the site's "Download PDF" button, for a touch of brand color."""
     p = doc.add_paragraph()
-    p.add_run(title.upper()).font.color.rgb = GREY_TEXT
+    p.add_run(title.upper()).font.color.rgb = ACCENT_BLUE
     p.runs[0].font.bold = True
     p.runs[0].font.size = Pt(11)
     p.space_after = Pt(6)
     return p
+
+def add_tag_grid(doc, tags, columns=4):
+    """Render tags as a borderless, shaded-cell grid - approximates the site's
+    flex-wrap 'chip' look far better than one long comma-separated paragraph."""
+    if not tags:
+        return
+    rows = (len(tags) + columns - 1) // columns
+    table = doc.add_table(rows=rows, cols=columns)
+    table.autofit = True
+    for idx, tag in enumerate(tags):
+        r, c = divmod(idx, columns)
+        cell = table.rows[r].cells[c]
+        set_cell_border(cell, top=True, left=True, bottom=True, right=True)
+        set_cell_shading(cell, TAG_BG)
+        p = cell.paragraphs[0]
+        p.paragraph_format.space_after = Pt(2)
+        p.paragraph_format.space_before = Pt(2)
+        run = p.add_run(tag)
+        run.font.size = Pt(9.5)
+    # Fill any leftover cells in the last row with empty shaded space (keeps a tidy grid)
+    for idx in range(len(tags), rows * columns):
+        r, c = divmod(idx, columns)
+        set_cell_shading(table.rows[r].cells[c], "FFFFFF")
 
 def add_detail_label(doc, text):
     """Small grey/bold sub-label, e.g. 'Werkzaamheden' or 'Opleidingen'."""
@@ -134,6 +168,16 @@ def add_text_with_breaks(paragraph, text):
 
 def generate_docx():
     """Generate Word document"""
+    # Check whether the output file is locked by another process (e.g. Word)
+    if OUTPUT_FILE.exists():
+        try:
+            with OUTPUT_FILE.open('r+b'):
+                pass
+        except PermissionError:
+            print(f"Error: {OUTPUT_FILE} is locked by another application (e.g. Word).")
+            print("Sluit het Word-document en probeer opnieuw.")
+            return False
+
     doc = Document()
 
     # Set default font
@@ -156,9 +200,34 @@ def generate_docx():
 
     add_section_title(doc, 'PERSOONLIJKE GEGEVENS')
 
+    # Photo, right-aligned (mirrors the site's profile-photo placement)
+    # personal-data.yml's `photo` path is relative to docs_dir (e.g. "assets/img/..."),
+    # same as how it's referenced in the built HTML.
+    photo_path = DATA_DIR.parent / personal.get("photo", "")
+    if personal.get("photo") and photo_path.is_file():
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+        p.add_run().add_picture(str(photo_path), width=Inches(1.2))
+        p.paragraph_format.space_after = Pt(6)
+
+    # Compact contact line (site's sidebar has no direct DOCX equivalent, but
+    # a recruiter reading a downloaded Word file still needs a way to reach out)
+    contacts = load_yaml("contact.yml") or []
+    if contacts:
+        p = doc.add_paragraph()
+        parts = []
+        for item in contacts:
+            if item.get("type") in ("phone", "email"):
+                parts.append(item.get("title", ""))
+            else:
+                parts.append(f"{item.get('label', '')}: {item.get('title', '')}")
+        run = p.add_run(" · ".join(parts))
+        run.font.color.rgb = GREY_TEXT
+        run.font.size = Pt(9.5)
+        p.paragraph_format.space_after = Pt(8)
+
     if fields:
         table = doc.add_table(rows=len(fields), cols=2)
-        table.style = 'Table Grid'
         table.autofit = False
         table.allow_autofit = False
 
@@ -187,9 +256,8 @@ def generate_docx():
 
     if tags:
         add_section_title(doc, 'KERNEXPERTISE')
-        p = doc.add_paragraph()
-        p.add_run(", ".join(tags))
-        p.paragraph_format.space_after = Pt(6)
+        add_tag_grid(doc, tags)
+        doc.add_paragraph().paragraph_format.space_after = Pt(3)
         add_horizontal_line(doc)
 
     # Personal Text
