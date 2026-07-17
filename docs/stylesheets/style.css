@@ -385,9 +385,18 @@ td.value {
   padding: 0 0 0 20px;
 }
 
-.engagement-summary[aria-expanded="true"] + .engagement-details {
+/* General-sibling (~), not adjacent (+): the optional .engagement-teaser
+   (shown for collapsed items) sits between .engagement-summary and
+   .engagement-details, which broke the adjacent-sibling match. */
+.engagement-summary[aria-expanded="true"] ~ .engagement-details {
   max-height: 2000px;
   padding-top: 12px;
+}
+
+/* Hide the teaser once expanded - the same keywords already appear in the
+   full Trefwoorden detail below, no need to show them twice. */
+.engagement-summary[aria-expanded="true"] ~ .engagement-teaser {
+  display: none;
 }
 
 .engagement-detail-item {
