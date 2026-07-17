@@ -200,6 +200,14 @@ def generate_pdf():
             min-width: 0 !important;
         }
 
+        /* Sections 2+ and separators: extend full width (under sidebar area) */
+        .main-content > section:not(:first-child),
+        .main-content > .block-sep {
+            margin-left: -175px !important;
+            width: calc(100% + 175px) !important;
+            box-sizing: border-box !important;
+        }
+
         /* Hide download button in PDF */
         .pdf-download-btn {
             display: none !important;
