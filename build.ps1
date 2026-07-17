@@ -5,6 +5,7 @@
 # Usage: .\build.ps1
 
 $ErrorActionPreference = "Stop"
+$env:PYTHONIOENCODING = "utf-8"
 $venvPython = Join-Path $PSScriptRoot ".venv\Scripts\python.exe"
 if (-not (Test-Path $venvPython)) {
     Write-Host "Virtual environment not found at .venv - run: python -m venv .venv; .venv\Scripts\pip install -r requirements.txt" -ForegroundColor Red
