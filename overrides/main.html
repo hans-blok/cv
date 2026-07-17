@@ -12,7 +12,7 @@
 <div class='container'>
 <aside class="urls-sidebar">
 <div class="sidebar-logo"><img src="assets/img/logo-header.jpg" alt="Logo" class="sidebar-logo-img"/></div>
-<a href="assets/cv.pdf" class="pdf-download-btn" download="cv.pdf">Download PDF</a>
+<a href="assets/cv.pdf" class="pdf-download-btn" download="CV - Hans Blok - {{ publicatiedatum_iso }}.pdf">Download PDF</a>
 <a href="assets/cv.docx" class="pdf-download-btn" download="cv.docx">Download DOCX</a>
 {{ contact_sidebar_html }}
 </aside>
@@ -20,7 +20,7 @@
 {{ page.content }}
 </div>
 </div>
-<div class='generated'>{{ build_date_utc.strftime('%d %B %Y %H:%M:%S') }}</div>
+<div class='generated'>{{ publicatiedatum_nl }}</div>
 {% for js in config.extra_javascript %}
 <script src="{{ js|url }}?v={{ build_date_utc.strftime('%Y%m%d%H%M%S') }}"></script>
 {% endfor %}

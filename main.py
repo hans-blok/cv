@@ -4,11 +4,12 @@ This is the ONLY place technical logic lives for turning docs/data/**
 (plain YAML/Markdown content, safe for non-technical editors) into the
 HTML structure defined by templates/*.html (owns all CSS classes).
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import markdown as md
 import yaml
+from babel.dates import format_date
 from jinja2 import Environment, FileSystemLoader
 
 ROOT = Path(__file__).resolve().parent
@@ -109,4 +110,12 @@ def on_env(env, config, files):
     """
     links = load_yaml("contact.yml")
     env.globals["contact_sidebar_html"] = jinja_env.get_template("contact_sidebar.html").render(links=links)
+
+    # Single source of truth for "today", computed once per build, so the
+    # visible publication date and the PDF download filename can never drift
+    # apart. Dutch month name via Babel's CLDR data - locale-independent
+    # (doesn't rely on the OS/browser locale) and no hardcoded month names.
+    today = datetime.now(timezone.utc).date()
+    env.globals["publicatiedatum_nl"] = format_date(today, format="d MMMM y", locale="nl_NL")
+    env.globals["publicatiedatum_iso"] = today.isoformat()
     return env
