@@ -145,6 +145,7 @@ def generate_pdf():
         /* Container: keep flex layout, remove auto-centering and max-width */
         .container {
             display: flex !important;
+            flex-direction: row !important;
             margin: 0 !important;
             padding: 8px 0 0 0 !important;
             max-width: none !important;
