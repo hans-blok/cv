@@ -25,12 +25,16 @@ title: CV
 <div class='block-sep'></div>
 
 <section class='block'><h2 class='block-title' id='cursussen'>CURSUSSEN</h2>
+<div class="engagement-item"><div class="engagement-summary" role="button" tabindex="0" aria-expanded="false"><span class="engagement-toggle">▶</span><div class="engagement-summary-content"><span class="engagement-org">Bekijk gevolgde cursussen</span></div></div><div class="engagement-details">
 {{ render_courses('courses') }}
+</div></div>
 </section>
 <div class='block-sep'></div>
 
 <section class='block'><h2 class='block-title' id='overige-cursussen'>OVERIGE CURSUSSEN</h2>
+<div class="engagement-item"><div class="engagement-summary" role="button" tabindex="0" aria-expanded="false"><span class="engagement-toggle">▶</span><div class="engagement-summary-content"><span class="engagement-org">Bekijk overige cursussen</span></div></div><div class="engagement-details">
 {{ render_courses('courses-short') }}
+</div></div>
 </section>
 <div class='block-sep'></div>
 
