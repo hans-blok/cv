@@ -146,53 +146,57 @@ def generate_pdf():
         .container {
             display: flex !important;
             margin: 0 !important;
-            padding: 0 !important;
+            padding: 8px 0 0 0 !important;
             max-width: none !important;
             align-items: flex-start !important;
-            gap: 0 !important;
+            gap: 20px !important;
         }
 
-        /* Sidebar: remove sticky positioning, add right border as separator */
+        /* Sidebar: remove sticky positioning, strip all borders, add only right separator */
         .urls-sidebar {
             position: static !important;
             top: auto !important;
-            align-self: stretch !important;
-            width: 160px !important;
-            min-width: 160px !important;
+            align-self: flex-start !important;
+            width: 155px !important;
+            min-width: 155px !important;
             flex-shrink: 0 !important;
             padding: 0 16px 0 0 !important;
-            margin-right: 16px !important;
-            border-right: 1px solid #d0d0d0 !important;
-            gap: 6px !important;
+            margin: 0 !important;
+            border: none !important;
+            border-right: 1px solid #c8c8c8 !important;
+            background: transparent !important;
+            gap: 5px !important;
         }
 
         /* Sidebar logo */
         .sidebar-logo {
-            margin-bottom: 16px !important;
+            margin-bottom: 14px !important;
         }
 
         .sidebar-logo-img {
-            max-width: 140px !important;
-            max-height: 90px !important;
+            max-width: 130px !important;
+            max-height: 80px !important;
         }
 
-        /* Sidebar contact links: smaller font for print */
+        /* Sidebar contact links: compact for print */
         .contact-link {
-            font-size: 0.78em !important;
-            padding: 3px 0 !important;
+            font-size: 0.77em !important;
+            padding: 2px 0 !important;
             gap: 5px !important;
+            border-radius: 0 !important;
+            background: transparent !important;
         }
 
         .contact-link::before {
-            width: 16px !important;
-            height: 16px !important;
+            width: 15px !important;
+            height: 15px !important;
+            flex-shrink: 0 !important;
         }
 
-        /* Main content: proper left spacing */
+        /* Main content: no extra padding needed, flex takes care of spacing */
         .main-content {
             flex: 1 !important;
             min-width: 0 !important;
-            padding-left: 0 !important;
         }
 
         /* Hide download button in PDF */
