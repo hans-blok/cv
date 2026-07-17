@@ -9,7 +9,16 @@
 {% endfor %}
 </head>
 <body>
+<div class='container'>
+<aside class="urls-sidebar">
+<div class="sidebar-logo"><img src="assets/img/logo-header.jpg" alt="Logo" class="sidebar-logo-img"/></div>
+<a href="assets/cv.pdf" class="pdf-download-btn" download="cv.pdf">Download PDF</a>
+{{ contact_sidebar_html }}
+</aside>
+<div class='main-content'>
 {{ page.content }}
+</div>
+</div>
 <div class='generated'>{{ build_date_utc.strftime('%d %B %Y %H:%M:%S') }}</div>
 {% for js in config.extra_javascript %}
 <script src="{{ js|url }}"></script>

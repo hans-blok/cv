@@ -15,7 +15,7 @@ nav:
   - CV: cv.md
 
 exclude_docs: |
-  includes/
+  data/
 
 extra_css:
   - stylesheets/style.css
@@ -30,8 +30,11 @@ markdown_extensions:
   - def_list
 
 plugins:
-  - include-markdown:
-      rewrite_relative_urls: false
+  - macros:
+      module_name: main
+
+hooks:
+  - main.py
 
 extra:
   generator: false
