@@ -85,15 +85,7 @@ def generate_pdf():
     # Remove title to prevent it showing in PDF header
     html_content = re.sub(r'<title>.*?</title>', '<title></title>', html_content, flags=re.IGNORECASE)
     
-    # Remove the entire sidebar - simple string find/replace approach
-    sidebar_start = html_content.find('<aside class="urls-sidebar">')
-    if sidebar_start != -1:
-        sidebar_end = html_content.find('</aside>', sidebar_start)
-        if sidebar_end != -1:
-            html_content = html_content[:sidebar_start] + html_content[sidebar_end + 8:]
-            print("✓ Sidebar removed from PDF")
-    else:
-        print("⚠ Warning: Could not find sidebar")
+    print("✓ Sidebar kept in PDF (download button will be hidden via CSS)")
     
     # Read the CSS file and inline it for PDF
     css_file = SITE_DIR / "stylesheets" / "style.css"
@@ -144,28 +136,25 @@ def generate_pdf():
             display: none !important;
         }
         
-        /* Full width for main content since sidebar is removed */
+        /* Container: keep flex layout, remove auto-centering and max-width */
         .container {
-            display: block !important;
+            display: flex !important;
             margin: 0 !important;
             padding: 12px !important;
             max-width: none !important;
-            flex-direction: column !important;
-            gap: 0 !important;
+            align-items: flex-start !important;
         }
         
-        .main-content {
-            margin: 0 !important;
-            margin-left: 0 !important;
-            width: 100% !important;
-            flex: none !important;
+        /* Sidebar: remove sticky positioning (doesn't work in print) */
+        .urls-sidebar {
+            position: static !important;
+            top: auto !important;
+            align-self: flex-start !important;
+            width: 180px !important;
+            flex-shrink: 0 !important;
         }
         
-        /* Force remove any sidebar remnants */
-        .urls-sidebar, aside {
-            display: none !important;
-        }
-        
+        /* Hide download button in PDF */
         .pdf-download-btn {
             display: none !important;
         }
