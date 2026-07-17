@@ -1,12 +1,15 @@
 """One-time migration script: convert content/*.txt (custom pipe-delimited DSL)
 into docs/includes/*.md fragments for the MkDocs-based site.
 
-Reuses the parsing/formatting functions from generate_site.py so the rendered
-HTML fragments are byte-for-byte consistent with what the legacy generator
+Reused the parsing/formatting functions from generate_site.py so the rendered
+HTML fragments were byte-for-byte consistent with what the legacy generator
 produced (minus base64 image embedding, which is replaced by static asset
 references).
 
-Re-runnable: safe to run again if content/*.txt changes during the transition.
+Already run; its output is committed under docs/includes/. Kept here for
+historical reference only - generate_site.py has since been removed, so this
+script is no longer runnable as-is. Going forward, edit docs/includes/*.md
+directly instead of content/*.txt.
 """
 import sys
 import html
