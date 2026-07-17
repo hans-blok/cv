@@ -235,31 +235,38 @@ def generate_docx():
 
     add_section_title(doc, 'PERSOONLIJKE GEGEVENS')
 
-    # Photo, right-aligned (mirrors the site's profile-photo placement)
-    # personal-data.yml's `photo` path is relative to docs_dir (e.g. "assets/img/..."),
-    # same as how it's referenced in the built HTML.
-    photo_path = DATA_DIR.parent / personal.get("photo", "")
-    if personal.get("photo") and photo_path.is_file():
-        p = doc.add_paragraph()
-        p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        p.add_run().add_picture(str(photo_path), width=Inches(1.2))
-        p.paragraph_format.space_after = Pt(6)
-
-    # Compact contact line: icon + short label only (never the raw URL),
-    # clickable via a real hyperlink - site's sidebar has no direct DOCX
-    # equivalent, but a recruiter reading a downloaded Word file still needs
-    # a way to reach out.
+    # Contact list (left) + photo (right), in a single borderless row - site's
+    # sidebar has no direct DOCX equivalent, but a recruiter reading a
+    # downloaded Word file still needs a way to reach out. Icon + short label
+    # only (never the raw URL), each a real clickable hyperlink.
     contacts = load_yaml("contact.yml") or []
-    if contacts:
-        p = doc.add_paragraph()
-        p.paragraph_format.space_after = Pt(8)
+    photo_path = DATA_DIR.parent / personal.get("photo", "")
+    has_photo = bool(personal.get("photo")) and photo_path.is_file()
+
+    if contacts or has_photo:
+        header = doc.add_table(rows=1, cols=2)
+        header.autofit = False
+        header.allow_autofit = False
+        contact_cell, photo_cell = header.rows[0].cells
+        set_cell_border(contact_cell, top=True, left=True, bottom=True, right=True)
+        set_cell_border(photo_cell, top=True, left=True, bottom=True, right=True)
+        contact_cell.width = Inches(5.0)
+        photo_cell.width = Inches(1.4)
+
+        contact_cell.paragraphs[0].paragraph_format.space_after = Pt(2)
         for i, item in enumerate(contacts):
-            if i > 0:
-                sep = p.add_run("     ")
-                sep.font.size = Pt(9.5)
+            p = contact_cell.paragraphs[0] if i == 0 else contact_cell.add_paragraph()
+            p.paragraph_format.space_after = Pt(2)
             icon = p.add_run(CONTACT_ICONS.get(item.get("type"), "") + " ")
             icon.font.size = Pt(9.5)
             add_hyperlink(p, item.get("url", ""), item.get("label", ""), size_pt=9.5)
+
+        if has_photo:
+            photo_p = photo_cell.paragraphs[0]
+            photo_p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            photo_p.add_run().add_picture(str(photo_path), width=Inches(1.2))
+
+        doc.add_paragraph().paragraph_format.space_after = Pt(3)
 
     if fields:
         table = doc.add_table(rows=len(fields), cols=2)
